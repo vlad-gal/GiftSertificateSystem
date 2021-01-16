@@ -24,6 +24,7 @@ public class RestExceptionHandler {
     public static final String PAGE_NOT_FOUND = "pageNotFound";
     public static final String METHOD_NOT_SUPPORT = "methodNotSupport";
     public static final String BODY_MISSING = "bodyIsMissing";
+    public static final String INTERNAL_ERROR = "internalError";
     private final MessageSource messageSource;
 
     @Autowired
@@ -36,7 +37,7 @@ public class RestExceptionHandler {
         String message = messageSource.getMessage(exception.getMessageKey(), new Object[]{exception.getMessageValue()},
                 locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
-        log.log(Level.ERROR, "Exception message: {}", message);
+        log.log(Level.ERROR, "ValidationException message: {}", message);
         return new ResponseEntity<>(errorHandler, HttpStatus.BAD_REQUEST);
     }
 
@@ -46,7 +47,7 @@ public class RestExceptionHandler {
         String message = messageSource.getMessage(exception.getMessageKey(), new Object[]{exception.getMessageValue()},
                 locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.NOT_FOUND);
-        log.log(Level.ERROR, "Exception message: {}", message);
+        log.log(Level.ERROR, "ResourceNotFoundException message: {}", message);
         return new ResponseEntity<>(errorHandler, HttpStatus.NOT_FOUND);
     }
 
@@ -54,7 +55,7 @@ public class RestExceptionHandler {
     public ResponseEntity<ErrorHandler> handleTypeMismatchException(TypeMismatchException exception, Locale locale) {
         String message = messageSource.getMessage(INCORRECT_TYPE, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
-        log.log(Level.ERROR, "Exception message: {}", exception.getMessage());
+        log.log(Level.ERROR, "TypeMismatchException message: {}", exception.getMessage());
         return new ResponseEntity<>(errorHandler, HttpStatus.BAD_REQUEST);
     }
 
@@ -62,7 +63,7 @@ public class RestExceptionHandler {
     public ResponseEntity<ErrorHandler> handleNoHandlerFoundException(NoHandlerFoundException exception, Locale locale) {
         String message = messageSource.getMessage(PAGE_NOT_FOUND, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.NOT_FOUND);
-        log.log(Level.ERROR, "Exception message: {}", exception.getMessage());
+        log.log(Level.ERROR, "NoHandlerFoundException message: {}", exception.getMessage());
         return new ResponseEntity<>(errorHandler, HttpStatus.NOT_FOUND);
     }
 
@@ -71,7 +72,7 @@ public class RestExceptionHandler {
             HttpRequestMethodNotSupportedException exception, Locale locale) {
         String message = messageSource.getMessage(METHOD_NOT_SUPPORT, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.METHOD_NOT_ALLOWED);
-        log.log(Level.ERROR, "Exception message: {}", exception.getMessage());
+        log.log(Level.ERROR, "HttpRequestMethodNotSupportedException message: {}", exception.getMessage());
         return new ResponseEntity<>(errorHandler, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
@@ -80,7 +81,15 @@ public class RestExceptionHandler {
             HttpMessageNotReadableException exception, Locale locale) {
         String message = messageSource.getMessage(BODY_MISSING, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
-        log.log(Level.ERROR, "Exception message: {}", exception.getMessage());
+        log.log(Level.ERROR, "HttpMessageNotReadableException message: {}", exception.getMessage());
         return new ResponseEntity<>(errorHandler, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorHandler> handleHException(Exception exception, Locale locale) {
+        String message = messageSource.getMessage(INTERNAL_ERROR, null, locale);
+        ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.INTERNAL_ERROR);
+        log.log(Level.ERROR, "Exception message: {}", exception.getMessage());
+        return new ResponseEntity<>(errorHandler, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
