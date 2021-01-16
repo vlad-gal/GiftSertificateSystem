@@ -9,6 +9,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.BadSqlGrammarException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
@@ -127,5 +128,15 @@ class GiftCertificateDaoImplTest {
     void whenFindGiftCertificateTagsThenShouldReturnSetTags() {
         Set<Tag> tagSet = giftCertificateDao.findGiftCertificateTags(1);
         assertEquals(3, tagSet.size());
+    }
+
+    @Test
+    void whenAddRelationBetweenTagAndGiftCertificateThenShouldNotThrowException() {
+        assertDoesNotThrow(() -> giftCertificateDao.addRelationBetweenTagAndGiftCertificate(2, 2));
+    }
+
+    @Test
+    void whenAddRelationBetweenTagAndGiftCertificateThenShouldThrowException() {
+        assertThrows(DuplicateKeyException.class ,() -> giftCertificateDao.addRelationBetweenTagAndGiftCertificate(1, 2));
     }
 }
