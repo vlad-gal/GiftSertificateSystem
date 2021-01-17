@@ -65,9 +65,7 @@ public class QueryParameterManager {
         StringBuilder query = new StringBuilder();
         if ((queryParameter.getTagName() == null || queryParameter.getTagName().isEmpty())) {
             if ((queryParameter.getCertificateName() == null || queryParameter.getCertificateName().isEmpty())
-                    && (queryParameter.getCertificateDescription() == null || queryParameter.getCertificateDescription().isEmpty())
-                    && (queryParameter.getOrder() == null || queryParameter.getOrder().isEmpty())
-                    && (queryParameter.getDirection() == null || queryParameter.getDirection().isEmpty())) {
+                    && (queryParameter.getCertificateDescription() == null || queryParameter.getCertificateDescription().isEmpty())) {
                 return query;
             } else {
                 return query.append(WHERE);
