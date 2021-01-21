@@ -34,7 +34,7 @@ public class SqlQuery {
     public final String INSERT_RELATION_BETWEEN_TAG_AND_GIFT_CERTIFICATE =
             "INSERT INTO certificates_has_tags (certificateId, tagId) VALUES (?, ?)";
     /*
-    Sql queries for gift certificate
+    Sql queries for tags
      */
     public final String SELECT_ALL_TAGS = "SELECT tagId, tagName FROM tags";
     public final String SELECT_TAG_BY_NAME = "SELECT tagId, tagName FROM tags WHERE tagName = ?";

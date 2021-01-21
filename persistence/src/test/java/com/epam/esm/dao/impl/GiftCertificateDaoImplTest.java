@@ -51,8 +51,8 @@ class GiftCertificateDaoImplTest {
         giftCertificate.setPrice(new BigDecimal("123.0"));
         giftCertificate.setCreatedDate(LocalDateTime.now());
         giftCertificate.setLastUpdateDate(LocalDateTime.now());
-        GiftCertificate expected = giftCertificateDao.add(giftCertificate);
-        assertEquals(expected, giftCertificate);
+        long actual = giftCertificateDao.add(giftCertificate);
+        assertEquals(6, actual);
     }
 
     @Test
@@ -137,6 +137,6 @@ class GiftCertificateDaoImplTest {
 
     @Test
     void whenAddRelationBetweenTagAndGiftCertificateThenShouldThrowException() {
-        assertThrows(DuplicateKeyException.class ,() -> giftCertificateDao.addRelationBetweenTagAndGiftCertificate(1, 2));
+        assertThrows(DuplicateKeyException.class, () -> giftCertificateDao.addRelationBetweenTagAndGiftCertificate(1, 2));
     }
 }

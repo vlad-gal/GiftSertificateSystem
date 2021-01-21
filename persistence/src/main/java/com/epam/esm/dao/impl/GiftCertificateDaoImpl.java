@@ -6,6 +6,7 @@ import com.epam.esm.dao.mapper.GiftCertificateMapper;
 import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.GeneratedKeysNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -34,7 +35,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     }
 
     @Override
-    public GiftCertificate add(GiftCertificate entity) {
+    public long add(GiftCertificate entity) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(con -> {
             PreparedStatement preparedStatement = con.prepareStatement(SqlQuery.INSERT_CERTIFICATE, Statement.RETURN_GENERATED_KEYS);
@@ -47,9 +48,9 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
             return preparedStatement;
         }, keyHolder);
         if (keyHolder.getKey() != null) {
-            entity.setId(keyHolder.getKey().longValue());
+            return keyHolder.getKey().longValue();
         }
-        return entity;
+        throw new GeneratedKeysNotFoundException("Generated id not found");
     }
 
     @Override

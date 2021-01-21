@@ -85,8 +85,8 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorHandler, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorHandler> handleHException(Exception exception, Locale locale) {
+    @ExceptionHandler(value = {Exception.class, RuntimeException.class})
+    public ResponseEntity<ErrorHandler> handleException(Exception exception, Locale locale) {
         String message = messageSource.getMessage(INTERNAL_ERROR, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.INTERNAL_ERROR);
         log.log(Level.ERROR, "Exception message: {}", exception.getMessage());

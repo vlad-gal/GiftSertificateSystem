@@ -1,6 +1,6 @@
 package com.epam.esm.validator;
 
-import com.epam.esm.dto.QueryParameter;
+import com.epam.esm.util.QueryParameter;
 import com.epam.esm.exception.ExceptionPropertyKey;
 import com.epam.esm.exception.ValidationException;
 import lombok.experimental.UtilityClass;
