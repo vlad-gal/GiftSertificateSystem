@@ -33,7 +33,9 @@ public class TagServiceImpl implements TagService {
     @Override
     public TagDto addTag(TagDto tagDto) {
         TagValidator.isValidTag(tagDto);
-        Tag addedTag = tagDao.add(modelMapper.map(tagDto, Tag.class));
+        Tag addedTag = modelMapper.map(tagDto, Tag.class);
+        long tagId = tagDao.add(addedTag);
+        addedTag.setTagId(tagId);
         log.log(Level.INFO, "Tag added: {}", addedTag);
         return modelMapper.map(addedTag, TagDto.class);
     }

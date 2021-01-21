@@ -58,8 +58,8 @@ class TagDaoImplTest {
     void whenAddCorrectTagThenShouldReturnCorrectTag() {
         Tag tag = new Tag();
         tag.setName("Drive");
-        Tag addedTag = tagDao.add(tag);
-        assertEquals(tag, addedTag);
+        long actual = tagDao.add(tag);
+        assertEquals(9, actual);
     }
 
     @Test

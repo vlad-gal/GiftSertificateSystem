@@ -3,7 +3,7 @@ package com.epam.esm.service.impl;
 import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dto.GiftCertificateDto;
-import com.epam.esm.dto.QueryParameter;
+import com.epam.esm.util.QueryParameter;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
@@ -51,8 +51,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         if (giftCertificateDto.getTags() != null) {
             giftCertificateDto.getTags().forEach(TagValidator::isValidTag);
         }
-        GiftCertificate giftCertificate = giftCertificateDao
-                .add(modelMapper.map(giftCertificateDto, GiftCertificate.class));
+        GiftCertificate giftCertificate = modelMapper.map(giftCertificateDto, GiftCertificate.class);
+        long certificateId = giftCertificateDao.add(giftCertificate);
+        giftCertificate.setId(certificateId);
         if (giftCertificate.getTags() != null) {
             giftCertificate.getTags().forEach(tag -> checkAndAddRelationBetweenTagAndGiftCertificate(giftCertificate.getId(), tag));
         }
@@ -132,7 +133,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                             tag.getName()));
         } else {
             log.log(Level.DEBUG, "New tag: {}", tag);
-            processedTag = tagDao.add(tag);
+            long tagId = tagDao.add(tag);
+            processedTag = tag;
+            processedTag.setTagId(tagId);
         }
         tag.setTagId(processedTag.getTagId());
         giftCertificateDao.addRelationBetweenTagAndGiftCertificate(processedTag.getTagId(), giftCertificateId);

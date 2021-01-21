@@ -1,6 +1,5 @@
 package com.epam.esm.util;
 
-import com.epam.esm.dto.QueryParameter;
 import lombok.experimental.UtilityClass;
 import lombok.extern.log4j.Log4j2;
 import org.apache.logging.log4j.Level;

@@ -1,6 +1,5 @@
 package com.epam.esm.util;
 
-import com.epam.esm.dto.QueryParameter;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 

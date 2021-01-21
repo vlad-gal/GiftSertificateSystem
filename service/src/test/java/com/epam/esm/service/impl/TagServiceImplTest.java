@@ -43,7 +43,7 @@ class TagServiceImplTest {
         tag.setTagId(1);
         tag.setName("Hi");
 
-        when(tagDao.add(modelMapper.map(tagDto, Tag.class))).thenReturn(tag);
+        when(tagDao.add(modelMapper.map(tagDto, Tag.class))).thenReturn(tag.getTagId());
         TagDto mockedTagDto = tagService.addTag(tagDto);
         assertEquals(tag, modelMapper.map(mockedTagDto, Tag.class));
     }

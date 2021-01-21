@@ -5,7 +5,7 @@ import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.impl.GiftCertificateDaoImpl;
 import com.epam.esm.dao.impl.TagDaoImpl;
 import com.epam.esm.dto.GiftCertificateDto;
-import com.epam.esm.dto.QueryParameter;
+import com.epam.esm.util.QueryParameter;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
@@ -71,11 +71,13 @@ class GiftCertificateServiceImplTest {
         tags.add(tag);
         giftCertificate.setTags(tags);
 
-        when(giftCertificateDao.add(any(GiftCertificate.class))).thenReturn(giftCertificate);
+        when(giftCertificateDao.add(any(GiftCertificate.class))).thenReturn(giftCertificate.getId());
         when(tagDao.findAll()).thenReturn(Collections.singletonList(tag));
         when(tagDao.findTagByName(tag.getName())).thenReturn(Optional.of(tag));
 
         GiftCertificateDto mockedGiftCertificateDto = giftCertificateService.addGiftCertificate(giftCertificateDto);
+        giftCertificate.setCreatedDate(mockedGiftCertificateDto.getCreatedDate());
+        giftCertificate.setLastUpdateDate(mockedGiftCertificateDto.getLastUpdateDate());
         assertEquals(giftCertificate, modelMapper.map(mockedGiftCertificateDto, GiftCertificate.class));
     }
 
@@ -109,7 +111,7 @@ class GiftCertificateServiceImplTest {
         tags.add(tag);
         giftCertificate.setTags(tags);
 
-        when(giftCertificateDao.add(any(GiftCertificate.class))).thenReturn(giftCertificate);
+        when(giftCertificateDao.add(any(GiftCertificate.class))).thenReturn(giftCertificate.getId());
         when(tagDao.findAll()).thenReturn(Collections.singletonList(tag));
         when(tagDao.findTagByName(tag.getName())).thenThrow(ResourceNotFoundException.class);
         assertThrows(ResourceNotFoundException.class, () -> giftCertificateService.addGiftCertificate(giftCertificateDto));
@@ -138,7 +140,7 @@ class GiftCertificateServiceImplTest {
 
         when(giftCertificateDao.findById(giftCertificate.getId())).thenReturn(Optional.of(giftCertificate));
         when(tagDao.findAll()).thenReturn(new LinkedList<>());
-        when(tagDao.add(tag)).thenReturn(tag);
+        when(tagDao.add(tag)).thenReturn(tag.getTagId());
         when(giftCertificateDao.update(giftCertificate)).thenReturn(giftCertificate);
         when(giftCertificateDao.findGiftCertificateTags(giftCertificate.getId())).thenReturn(tags);
 
@@ -288,7 +290,7 @@ class GiftCertificateServiceImplTest {
         when(giftCertificateDao.findById(giftCertificate.getId())).thenReturn(Optional.of(giftCertificate));
         when(giftCertificateDao.update(giftCertificate)).thenReturn(giftCertificate);
         when(tagDao.findAll()).thenReturn(new LinkedList<>());
-        when(tagDao.add(tag)).thenReturn(tag);
+        when(tagDao.add(tag)).thenReturn(tag.getTagId());
         when(giftCertificateDao.findGiftCertificateTags(giftCertificate.getId())).thenReturn(tags);
         GiftCertificateDto mockedGiftCertificateDto = giftCertificateService
                 .updateGiftCertificate(giftCertificate.getId(), giftCertificateDto);
@@ -306,6 +308,6 @@ class GiftCertificateServiceImplTest {
         giftCertificateDto.setCreatedDate(LocalDateTime.of(2012, 12, 2, 14, 56, 44));
         giftCertificateDto.setLastUpdateDate(LocalDateTime.of(2012, 12, 2, 14, 56, 44));
 
-        assertThrows(ValidationException.class,() -> giftCertificateService.updateGiftCertificate(-123,giftCertificateDto));
+        assertThrows(ValidationException.class, () -> giftCertificateService.updateGiftCertificate(-123, giftCertificateDto));
     }
 }
