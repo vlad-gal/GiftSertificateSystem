@@ -2,8 +2,7 @@ package com.epam.esm.handler;
 
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ValidationException;
-import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.Level;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
@@ -17,7 +16,7 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.Locale;
 
-@Log4j2
+@Slf4j
 @RestControllerAdvice
 public class RestExceptionHandler {
     public static final String INCORRECT_TYPE = "incorrectType";
@@ -37,7 +36,7 @@ public class RestExceptionHandler {
         String message = messageSource.getMessage(exception.getMessageKey(), new Object[]{exception.getMessageValue()},
                 locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
-        log.log(Level.ERROR, "ValidationException message: {}", message);
+        log.error("ValidationException message: {}", message);
         return new ResponseEntity<>(errorHandler, HttpStatus.BAD_REQUEST);
     }
 
@@ -47,7 +46,7 @@ public class RestExceptionHandler {
         String message = messageSource.getMessage(exception.getMessageKey(), new Object[]{exception.getMessageValue()},
                 locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.NOT_FOUND);
-        log.log(Level.ERROR, "ResourceNotFoundException message: {}", message);
+        log.error("ResourceNotFoundException message: {}", message);
         return new ResponseEntity<>(errorHandler, HttpStatus.NOT_FOUND);
     }
 
@@ -55,7 +54,7 @@ public class RestExceptionHandler {
     public ResponseEntity<ErrorHandler> handleTypeMismatchException(TypeMismatchException exception, Locale locale) {
         String message = messageSource.getMessage(INCORRECT_TYPE, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
-        log.log(Level.ERROR, "TypeMismatchException message: {}", exception.getMessage());
+        log.error("TypeMismatchException message: {}", exception.getMessage());
         return new ResponseEntity<>(errorHandler, HttpStatus.BAD_REQUEST);
     }
 
@@ -63,7 +62,7 @@ public class RestExceptionHandler {
     public ResponseEntity<ErrorHandler> handleNoHandlerFoundException(NoHandlerFoundException exception, Locale locale) {
         String message = messageSource.getMessage(PAGE_NOT_FOUND, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.NOT_FOUND);
-        log.log(Level.ERROR, "NoHandlerFoundException message: {}", exception.getMessage());
+        log.error("NoHandlerFoundException message: {}", exception.getMessage());
         return new ResponseEntity<>(errorHandler, HttpStatus.NOT_FOUND);
     }
 
@@ -72,7 +71,7 @@ public class RestExceptionHandler {
             HttpRequestMethodNotSupportedException exception, Locale locale) {
         String message = messageSource.getMessage(METHOD_NOT_SUPPORT, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.METHOD_NOT_ALLOWED);
-        log.log(Level.ERROR, "HttpRequestMethodNotSupportedException message: {}", exception.getMessage());
+        log.error("HttpRequestMethodNotSupportedException message: {}", exception.getMessage());
         return new ResponseEntity<>(errorHandler, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
@@ -81,7 +80,7 @@ public class RestExceptionHandler {
             HttpMessageNotReadableException exception, Locale locale) {
         String message = messageSource.getMessage(BODY_MISSING, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
-        log.log(Level.ERROR, "HttpMessageNotReadableException message: {}", exception.getMessage());
+        log.error("HttpMessageNotReadableException message: {}", exception.getMessage());
         return new ResponseEntity<>(errorHandler, HttpStatus.BAD_REQUEST);
     }
 
@@ -89,7 +88,7 @@ public class RestExceptionHandler {
     public ResponseEntity<ErrorHandler> handleException(Exception exception, Locale locale) {
         String message = messageSource.getMessage(INTERNAL_ERROR, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.INTERNAL_ERROR);
-        log.log(Level.ERROR, "Exception message: {}", exception.getMessage());
+        log.error("Exception message: {}", exception.getMessage());
         return new ResponseEntity<>(errorHandler, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

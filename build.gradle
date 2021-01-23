@@ -1,29 +1,35 @@
-group 'com.epam.esm'
-version '1.0-SNAPSHOT'
-
-ext {
-    spring_version = "5.3.2"
-    jackson_version = "2.12.0"
-    log4j2_version = "2.14.0"
+plugins {
+    id 'org.springframework.boot' version "${spring_boot_version}"
+    id 'io.spring.dependency-management' version "${spring_dependency_management_version}"
 }
-
 allprojects {
+    group 'com.epam.esm'
+    version '1.0-SNAPSHOT'
+}
+springBoot{
+    mainClass = 'com.epam.esm.GiftCertificateSystem'
+}
+subprojects {
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
     apply plugin: 'java'
+    sourceCompatibility = '1.8'
     repositories {
         mavenCentral()
     }
     dependencies {
-        implementation("org.springframework:spring-context:${spring_version}")
-        implementation("org.springframework:spring-core:${spring_version}")
-        implementation("org.springframework:spring-jdbc:${spring_version}")
-        testImplementation('org.junit.jupiter:junit-jupiter-api:5.+')
-        testRuntimeOnly('org.junit.jupiter:junit-jupiter-engine')
-        implementation("org.apache.logging.log4j:log4j-core:${log4j2_version}")
-        implementation("org.apache.logging.log4j:log4j-api:${log4j2_version}")
-        implementation("org.projectlombok:lombok:1.18.16")
-        annotationProcessor("org.projectlombok:lombok:1.18.16")
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+        implementation('org.springframework.boot:spring-boot-starter')
+        testImplementation('org.springframework.boot:spring-boot-starter-test')
     }
     test {
         useJUnitPlatform()
+    }
+    bootJar {
+        enabled = false
+    }
+    jar{
+        enabled = true
     }
 }

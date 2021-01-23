@@ -8,7 +8,7 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class TagValidator {
     private final long MIN_ID = 1;
-    private final String REGEX_NAME = "[‡-ˇ¿-ﬂ\\w\\s\\d\\.,?!]{1,45}";
+    private final String REGEX_NAME = "[–∞-—è–ê-–Ø\\w\\s\\d\\.,?!]{1,45}";
 
     public void isValidTag(TagDto tagDto) {
         isValidName(tagDto.getName());

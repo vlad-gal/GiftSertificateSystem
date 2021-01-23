@@ -1,14 +1,6 @@
-group 'com.epam.esm'
-version '1.0-SNAPSHOT'
-
-repositories {
-    mavenCentral()
-}
-
 dependencies {
     implementation project(":persistence");
-    implementation("org.modelmapper:modelmapper:2.3.9")
-    implementation("com.fasterxml.jackson.core:jackson-annotations:${jackson_version}")
-    testCompile("org.junit.jupiter:junit-jupiter-params:5.7.0")
-    testCompile("org.mockito:mockito-core:3.7.0")
+    implementation('org.modelmapper:modelmapper:2.3.9')
+    implementation('com.fasterxml.jackson.core:jackson-annotations')
+    implementation('org.springframework:spring-jdbc')
 }

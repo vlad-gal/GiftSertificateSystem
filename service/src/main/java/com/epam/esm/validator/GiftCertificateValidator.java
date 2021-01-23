@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 @UtilityClass
 public class GiftCertificateValidator {
-    private final String REGEX_NAME_AND_DESCRIPTION = "[‡-ˇ¿-ﬂ\\w\\s\\d\\.,?!]{1,250}";
+    private final String REGEX_NAME_AND_DESCRIPTION = "[–∞-—è–ê-–Ø\\w\\s\\d\\.,?!]{1,250}";
     private final long MIN_ID = 1;
     private final BigDecimal MIN_PRICE = new BigDecimal("0.01");
     private final BigDecimal MAX_PRICE = new BigDecimal("1000000");

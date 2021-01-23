@@ -7,8 +7,8 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class QueryParameterValidator {
-    private final String REGEX_TAG_NAME = "[‡-ˇ¿-ﬂ\\w\\s\\d\\.,?!]{1,45}";
-    private final String REGEX_GIFT_CERTIFICATE_NAME_AND_DESCRIPTION = "[‡-ˇ¿-ﬂ\\w\\s\\d\\.,?!]{1,250}";
+    private final String REGEX_TAG_NAME = "[–∞-—è–ê-–Ø\\w\\s\\d\\.,?!]{1,45}";
+    private final String REGEX_GIFT_CERTIFICATE_NAME_AND_DESCRIPTION = "[–∞-—è–ê-–Ø\\w\\s\\d\\.,?!]{1,250}";
     private final String REGEX_ORDER = "name|description";
     private final String REGEX_DIRECTION = "asc|desc";
 
