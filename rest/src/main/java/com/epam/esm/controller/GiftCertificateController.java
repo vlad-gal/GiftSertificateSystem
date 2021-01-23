@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Set;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 /**
  * The {@code GiftCertificateController} class is an endpoint of the API
  * which allows its users to perform CRUD operations on gift certificates.
@@ -98,6 +101,19 @@ public class GiftCertificateController {
     @GetMapping("/{id}")
     public ResponseEntity<GiftCertificateDto> findGiftCertificateById(@PathVariable("id") long id) {
         GiftCertificateDto giftCertificate = giftCertificateService.findGiftCertificateById(id);
+        giftCertificate.add(linkTo(methodOn(GiftCertificateController.class)
+                .findGiftCertificateTags(giftCertificate.getId()))
+                .withRel("tags"));
+        giftCertificate.add(linkTo(methodOn(GiftCertificateController.class)
+                .findGiftCertificateById(giftCertificate.getId()))
+                .withSelfRel());
+        giftCertificate.add(linkTo(methodOn(GiftCertificateController.class)
+                .updateGiftCertificate(giftCertificate.getId(),giftCertificate))
+                .withRel("update"));
+        giftCertificate.add(linkTo(methodOn(GiftCertificateController.class)
+                .updateGiftCertificate(giftCertificate.getId(),giftCertificate))
+                .withRel("delete"));
+
         return new ResponseEntity<>(giftCertificate, HttpStatus.OK);
     }
 

@@ -32,4 +32,8 @@ subprojects {
     jar{
         enabled = true
     }
+
 }
+//bootRun{
+//    systemProperty 'spring.profiles.active', 'dev'
+//}

@@ -1,8 +1,12 @@
 package com.epam.esm.config;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.*;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
@@ -12,18 +16,22 @@ import java.beans.PropertyVetoException;
 import java.util.Properties;
 
 @Configuration
-@PropertySource("classpath:db-prod.properties")
-@ComponentScan("com.epam.esm")
+@ConfigurationProperties("spring.datasource")
 public class PersistenceConfig {
+    @Setter
+    private String driverClassName;
+    @Setter
+    private String url;
+    @Setter
+    private String username;
+    @Setter
+    private String password;
 
     @Profile("dev")
     @Bean
-    public DataSource developmentDataSource(@Value("${spring.database.driverClassName}") String driverName,
-                                            @Value("${spring.database.url}") String url,
-                                            @Value("${spring.database.username}") String username,
-                                            @Value("${spring.database.password}") String password) {
+    public DataSource developmentDataSource() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(driverName);
+        dataSource.setDriverClassName(driverClassName);
         dataSource.setUrl(url);
         dataSource.setUsername(username);
         dataSource.setPassword(password);
@@ -32,13 +40,10 @@ public class PersistenceConfig {
 
     @Profile("prod")
     @Bean
-    public DataSource productionDataSource(@Value("${spring.database.driverClassName}") String driverName,
-                                           @Value("${spring.database.url}") String url,
-                                           @Value("${spring.database.username}") String username,
-                                           @Value("${spring.database.password}") String password) {
+    public DataSource productionDataSource() {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
         try {
-            dataSource.setDriverClass(driverName);
+            dataSource.setDriverClass(driverClassName);
             dataSource.setJdbcUrl(url);
             dataSource.setUser(username);
             dataSource.setPassword(password);
@@ -47,6 +52,12 @@ public class PersistenceConfig {
             throw new CannotGetJdbcConnectionException("Error while get connection to database");
         }
     }
+
+//    @Bean
+//    public EntityManagerFactory entityManagerFactory(){
+//
+//    }
+
 
     @Bean
     public LocalSessionFactoryBean sessionFactory(DataSource dataSource, @Value("${hibernate.show_sql}") String showSql,
