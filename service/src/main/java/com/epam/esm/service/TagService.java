@@ -6,7 +6,7 @@ import java.util.Set;
 
 public interface TagService {
 
-    Set<TagDto> findAllTags();
+    Set<TagDto> findAllTags(int limit, int offset);
 
     TagDto findTagById(long id);
 

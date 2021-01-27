@@ -2,20 +2,22 @@ package com.epam.esm.config;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
-import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
 import java.util.Properties;
 
 @Configuration
+@ComponentScan("com.epam.esm")
 @ConfigurationProperties("spring.datasource")
 public class PersistenceConfig {
     @Setter
@@ -26,6 +28,12 @@ public class PersistenceConfig {
     private String username;
     @Setter
     private String password;
+    @Setter
+    private String showSql;
+    @Setter
+    private String dialect;
+    @Setter
+    private String formatSql;
 
     @Profile("dev")
     @Bean
@@ -53,24 +61,17 @@ public class PersistenceConfig {
         }
     }
 
-//    @Bean
-//    public EntityManagerFactory entityManagerFactory(){
-//
-//    }
-
-
     @Bean
-    public LocalSessionFactoryBean sessionFactory(DataSource dataSource, @Value("${hibernate.show_sql}") String showSql,
-                                                  @Value("${hibernate.dialect}") String dialect) {
-        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
-        sessionFactory.setDataSource(dataSource);
-        sessionFactory.setPackagesToScan("com.epam.esm.entity");
+    public LocalContainerEntityManagerFactoryBean managerFactory(DataSource dataSource) {
+        LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
+        entityManager.setDataSource(dataSource);
+        entityManager.setPackagesToScan("com.epam.esm.entity");
+        entityManager.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         Properties hibernateProperties = new Properties();
-        hibernateProperties.put("", true);
-        hibernateProperties.put("", "");
-
-        sessionFactory.setHibernateProperties(hibernateProperties);
-        return sessionFactory;
+        hibernateProperties.put("hibernate.dialect", dialect);
+        hibernateProperties.put("hibernate.show_sql", showSql);
+        hibernateProperties.put("hibernate.format_sql", formatSql);
+        entityManager.setJpaProperties(hibernateProperties);
+        return entityManager;
     }
-
 }

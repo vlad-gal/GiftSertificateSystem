@@ -1,6 +1,7 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.dto.QueryParameterDto;
 import com.epam.esm.util.QueryParameter;
 import com.epam.esm.dto.TagDto;
 
@@ -14,7 +15,7 @@ public interface GiftCertificateService {
 
     GiftCertificateDto findGiftCertificateById(long id);
 
-    List<GiftCertificateDto> findGiftCertificatesByParameters(QueryParameter queryParameter);
+    List<GiftCertificateDto> findGiftCertificatesByParameters(QueryParameterDto queryParameter);
 
     void deleteGiftCertificateById(long id);
 

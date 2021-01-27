@@ -88,7 +88,7 @@ public class RestExceptionHandler {
     public ResponseEntity<ErrorHandler> handleException(Exception exception, Locale locale) {
         String message = messageSource.getMessage(INTERNAL_ERROR, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.INTERNAL_ERROR);
-        log.error("Exception message: {}", exception.getMessage());
+        log.error("Exception message: {}", exception);
         return new ResponseEntity<>(errorHandler, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

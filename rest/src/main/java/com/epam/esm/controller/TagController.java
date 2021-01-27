@@ -51,7 +51,7 @@ public class TagController {
      * @param tagDto Tag to be inserted into storage. Inferred from the request body.
      * @return {@link ResponseEntity} with the inserted tag and its location included.
      */
-    @PostMapping
+    @PostMapping//+
     public ResponseEntity<TagDto> addTag(@RequestBody TagDto tagDto) {
         TagDto addedTagDto = tagService.addTag(tagDto);
         return new ResponseEntity<>(addedTagDto, HttpStatus.OK);
@@ -69,7 +69,7 @@ public class TagController {
      * @param id Identifier of the requested tag. Inferred from the request URI.
      * @return {@link ResponseEntity} with found tag.
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{id}")//+
     public ResponseEntity<TagDto> findTagById(@PathVariable("id") long id) {
         TagDto tagDto = tagService.findTagById(id);
         return new ResponseEntity<>(tagDto, HttpStatus.OK);
@@ -84,9 +84,10 @@ public class TagController {
      *
      * @return {@link ResponseEntity} with the list of the gift certificates.
      */
-    @GetMapping
-    public ResponseEntity<Set<TagDto>> findAllTags() {
-        Set<TagDto> tagsDto = tagService.findAllTags();
+    @GetMapping//+
+    public ResponseEntity<Set<TagDto>> findAllTags(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
+                                                   @RequestParam(value = "offset", required = false, defaultValue = "0") int offset) {
+        Set<TagDto> tagsDto = tagService.findAllTags(limit,offset);
         return new ResponseEntity<>(tagsDto, HttpStatus.OK);
     }
 
@@ -102,7 +103,7 @@ public class TagController {
      *
      * @param id The identifier of the tag to be deleted. Inferred from the request URI.
      */
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{id}")//+
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTagById(@PathVariable("id") long id) {
         tagService.deleteTagById(id);

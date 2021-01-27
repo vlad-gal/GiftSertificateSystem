@@ -1,9 +1,9 @@
 package com.epam.esm.controller;
 
 import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.dto.QueryParameterDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.GiftCertificateService;
-import com.epam.esm.util.QueryParameter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -58,7 +58,7 @@ public class GiftCertificateController {
      * @param giftCertificateDto Gift certificate to be inserted into storage. Inferred from the request body.
      * @return {@link ResponseEntity} with the inserted gift certificate and its location included.
      */
-    @PostMapping
+    @PostMapping //+
     public ResponseEntity<GiftCertificateDto> addGiftCertificate(@RequestBody GiftCertificateDto giftCertificateDto) {
         GiftCertificateDto addedGiftCertificateDto = giftCertificateService.addGiftCertificate(giftCertificateDto);
         return new ResponseEntity<>(addedGiftCertificateDto, HttpStatus.OK);
@@ -78,12 +78,12 @@ public class GiftCertificateController {
      * @param tagDto            Inserted value of the tag.
      * @return {@link ResponseEntity} with the set of tags which belongs to the gift certificate.
      */
-    @PutMapping("/{id}/tags")
-    public ResponseEntity<Set<TagDto>> addTagToGiftCertificate(@PathVariable("id") long giftCertificateId,
-                                                               @RequestBody TagDto tagDto) {
-        GiftCertificateDto giftCertificateDto = giftCertificateService.addTagToGiftCertificate(giftCertificateId, tagDto);
-        return new ResponseEntity<>(giftCertificateDto.getTags(), HttpStatus.OK);
-    }
+//    @PutMapping("/{id}/tags")
+//    public ResponseEntity<Set<TagDto>> addTagToGiftCertificate(@PathVariable("id") long giftCertificateId,
+//                                                               @RequestBody TagDto tagDto) {
+//        GiftCertificateDto giftCertificateDto = giftCertificateService.addTagToGiftCertificate(giftCertificateId, tagDto);
+//        return new ResponseEntity<>(giftCertificateDto.getTags(), HttpStatus.OK);
+//    }
 
     /**
      * Returns the gift certificate with the specified identifier from the storage.
@@ -101,17 +101,17 @@ public class GiftCertificateController {
     @GetMapping("/{id}")
     public ResponseEntity<GiftCertificateDto> findGiftCertificateById(@PathVariable("id") long id) {
         GiftCertificateDto giftCertificate = giftCertificateService.findGiftCertificateById(id);
-        giftCertificate.add(linkTo(methodOn(GiftCertificateController.class)
-                .findGiftCertificateTags(giftCertificate.getId()))
-                .withRel("tags"));
+//        giftCertificate.add(linkTo(methodOn(GiftCertificateController.class)
+//                .findGiftCertificateTags(giftCertificate.getId()))
+//                .withRel("tags"));
         giftCertificate.add(linkTo(methodOn(GiftCertificateController.class)
                 .findGiftCertificateById(giftCertificate.getId()))
                 .withSelfRel());
         giftCertificate.add(linkTo(methodOn(GiftCertificateController.class)
-                .updateGiftCertificate(giftCertificate.getId(),giftCertificate))
+                .updateGiftCertificate(giftCertificate.getId(), giftCertificate))
                 .withRel("update"));
         giftCertificate.add(linkTo(methodOn(GiftCertificateController.class)
-                .updateGiftCertificate(giftCertificate.getId(),giftCertificate))
+                .updateGiftCertificate(giftCertificate.getId(), giftCertificate))
                 .withRel("delete"));
 
         return new ResponseEntity<>(giftCertificate, HttpStatus.OK);
@@ -129,12 +129,12 @@ public class GiftCertificateController {
      * @param certificateId Identifier of the requested gift certificate. Inferred from the request URI.
      * @return {@link ResponseEntity} with the set of tags which belongs to the gift certificate.
      */
-    @GetMapping("/{id}/tags")
-    public ResponseEntity<Set<TagDto>> findGiftCertificateTags(@PathVariable("id") long certificateId) {
-        GiftCertificateDto giftCertificate = giftCertificateService.findGiftCertificateById(certificateId);
-        Set<TagDto> tags = giftCertificate.getTags();
-        return new ResponseEntity<>(tags, HttpStatus.OK);
-    }
+//    @GetMapping("/{id}/tags")
+//    public ResponseEntity<Set<TagDto>> findGiftCertificateTags(@PathVariable("id") long certificateId) {
+//        GiftCertificateDto giftCertificate = giftCertificateService.findGiftCertificateById(certificateId);
+////        Set<TagDto> tags = giftCertificate.getTags();
+//        return new ResponseEntity<>(tags, HttpStatus.OK);
+//    }
 
     /**
      * Find the gift certificate in the storage by various parameter passed as a parameter in the request URI.
@@ -166,7 +166,7 @@ public class GiftCertificateController {
      @RequestParam(value = "certificateDescription", required = false) String certificateDescription,
      @RequestParam(value = "order", required = false) String order,
      @RequestParam(value = "direction", required = false) String direction) {
-        QueryParameter queryParameter = new QueryParameter(tagName, certificateName, certificateDescription, order, direction);
+        QueryParameterDto queryParameter = new QueryParameterDto(tagName, certificateName, certificateDescription, order, direction);
         List<GiftCertificateDto> giftCertificates = giftCertificateService.findGiftCertificatesByParameters(queryParameter);
         return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
     }

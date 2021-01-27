@@ -1,10 +1,9 @@
 package com.epam.esm.util;
 
 import lombok.experimental.UtilityClass;
-import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.Level;
+import lombok.extern.slf4j.Slf4j;
 
-@Log4j2
+@Slf4j
 @UtilityClass
 public class QueryParameterManager {
     private final String JOIN_CERTIFICATES_HAS_TAGS_AND_TAGS =
@@ -56,7 +55,7 @@ public class QueryParameterManager {
                 query.append(ASC.toUpperCase());
             }
         }
-        log.log(Level.DEBUG, "Created query: {}", query);
+        log.debug("Created query: {}", query);
         return query.toString();
     }
 

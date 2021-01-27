@@ -1,16 +1,19 @@
 package com.epam.esm.config;
 
+import org.hibernate.SessionFactory;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.orm.hibernate5.HibernateTransactionManager;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.TransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import javax.sql.DataSource;
+import javax.persistence.EntityManagerFactory;
 
 @Component
 @ComponentScan("com.epam.esm")
@@ -26,8 +29,14 @@ public class ServiceConfig {
         return modelMapper;
     }
 
+
     @Bean
-    public TransactionManager transactionManager(DataSource dataSource) {
-        return new DataSourceTransactionManager(dataSource);
+    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory){
+        return new JpaTransactionManager(entityManagerFactory);
     }
+
+//    @Bean
+//    public HibernateTransactionManager transactionManager(LocalSessionFactoryBean sessionFactory) {
+//        return new HibernateTransactionManager(sessionFactory.getObject());
+//    }
 }

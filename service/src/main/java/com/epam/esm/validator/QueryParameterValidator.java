@@ -1,6 +1,6 @@
 package com.epam.esm.validator;
 
-import com.epam.esm.util.QueryParameter;
+import com.epam.esm.dto.QueryParameterDto;
 import com.epam.esm.exception.ExceptionPropertyKey;
 import com.epam.esm.exception.ValidationException;
 import lombok.experimental.UtilityClass;
@@ -12,7 +12,7 @@ public class QueryParameterValidator {
     private final String REGEX_ORDER = "name|description";
     private final String REGEX_DIRECTION = "asc|desc";
 
-    public void isValidQueryParameters(QueryParameter queryParameter) {
+    public void isValidQueryParameters(QueryParameterDto queryParameter) {
         isValidTagName(queryParameter.getTagName());
         isValidGiftCertificateName(queryParameter.getCertificateName());
         isValidGiftCertificateDescription(queryParameter.getCertificateDescription());

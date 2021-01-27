@@ -1,59 +1,48 @@
 package com.epam.esm.dao.impl;
 
-import com.epam.esm.dao.SqlQuery;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.GeneratedKeysNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public class TagDaoImpl implements TagDao {
-    private final JdbcTemplate jdbcTemplate;
-    private final TagMapper tagMapper;
+    @PersistenceContext
+    private EntityManager entityManager;
 
-    @Autowired
-    public TagDaoImpl(JdbcTemplate jdbcTemplate, TagMapper tagMapper) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.tagMapper = tagMapper;
-    }
-
-    @Override
+    @Override//+
     public Optional<Tag> findById(long id) {
-        return jdbcTemplate.query(SqlQuery.SELECT_TAG_BY_ID, tagMapper, id).stream().findFirst();
+        return Optional.of(entityManager.find(Tag.class, id));
+    }
+
+    @Override//+
+    public List<Tag> findAll(int limit, int offset) {
+        return entityManager.createQuery("select t from Tag t", Tag.class)
+                .setFirstResult(offset)
+                .setMaxResults(limit)
+                .getResultList();
     }
 
     @Override
-    public List<Tag> findAll() {
-        return jdbcTemplate.query(SqlQuery.SELECT_ALL_TAGS, tagMapper);
+    public List<Tag> findAll() {//+
+        return entityManager.createQuery("select t from Tag t", Tag.class)
+                .getResultList();
     }
 
-    @Override
+    @Override//+
     public long add(Tag entity) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(con -> {
-            PreparedStatement preparedStatement = con.prepareStatement(SqlQuery.INSERT_TAG, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, entity.getName());
-            return preparedStatement;
-        }, keyHolder);
-        if (keyHolder.getKey() != null) {
-            return keyHolder.getKey().longValue();
-        }
-        throw new GeneratedKeysNotFoundException("Generated id not found");
+        entityManager.persist(entity);
+        return entity.getTagId();
     }
 
     @Override
-    public void removeById(long id) {
-        jdbcTemplate.update(SqlQuery.DELETE_TAG, id);
+    public void removeById(long id) {//+
+        entityManager.createQuery("delete from Tag where tagId = ?1")
+                .setParameter(1, id).executeUpdate();
     }
 
     @Override
@@ -61,8 +50,11 @@ public class TagDaoImpl implements TagDao {
         throw new UnsupportedOperationException("Update is not available action for Tag");
     }
 
-    @Override
+    @Override//+
     public Optional<Tag> findTagByName(String name) {
-        return jdbcTemplate.query(SqlQuery.SELECT_TAG_BY_NAME, tagMapper, name).stream().findFirst();
+        Tag foundTag = entityManager.createQuery("select t from Tag t where t.name= ?1", Tag.class)
+                .setParameter(1, name)
+                .getSingleResult();
+        return Optional.of(foundTag);
     }
 }
