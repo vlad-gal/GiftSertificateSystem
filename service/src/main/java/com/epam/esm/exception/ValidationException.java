@@ -2,18 +2,18 @@ package com.epam.esm.exception;
 
 public class ValidationException extends RuntimeException {
     private String messageKey;
-    private Object messageValue;
+    private Object[] messageValues;
 
-    public ValidationException(String messageKey, Object messageValue) {
+    public ValidationException(String messageKey, Object... messageValues) {
         this.messageKey = messageKey;
-        this.messageValue = messageValue;
+        this.messageValues = messageValues;
     }
 
     public String getMessageKey() {
         return messageKey;
     }
 
-    public Object getMessageValue() {
-        return messageValue;
+    public Object[] getMessageValues() {
+        return messageValues;
     }
 }

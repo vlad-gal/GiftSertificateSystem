@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -85,9 +86,10 @@ public class TagController {
      * @return {@link ResponseEntity} with the list of the gift certificates.
      */
     @GetMapping//+
-    public ResponseEntity<Set<TagDto>> findAllTags(@RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
-                                                   @RequestParam(value = "offset", required = false, defaultValue = "0") int offset) {
-        Set<TagDto> tagsDto = tagService.findAllTags(limit,offset);
+    public ResponseEntity<Set<TagDto>> findAllTags
+    (@RequestParam Map<String, String> queryParameters, @RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
+     @RequestParam(value = "offset", required = false, defaultValue = "0") int offset) {
+        Set<TagDto> tagsDto = tagService.findAllTags(limit, offset);
         return new ResponseEntity<>(tagsDto, HttpStatus.OK);
     }
 

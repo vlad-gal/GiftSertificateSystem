@@ -33,7 +33,7 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorHandler> handleValidationException(ValidationException exception, Locale locale) {
-        String message = messageSource.getMessage(exception.getMessageKey(), new Object[]{exception.getMessageValue()},
+        String message = messageSource.getMessage(exception.getMessageKey(), exception.getMessageValues(),
                 locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
         log.error("ValidationException message: {}", message);

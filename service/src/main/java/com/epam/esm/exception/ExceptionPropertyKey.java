@@ -15,4 +15,7 @@ public class ExceptionPropertyKey {
     public final String INCORRECT_DURATION = "incorrectDuration";
     public final String INCORRECT_ORDER = "incorrectOrder";
     public final String INCORRECT_DIRECTION = "incorrectDirection";
+    public final String INCORRECT_FIELD_NAME = "incorrectFieldName";
+    public final String INCORRECT_FIELD_VALUE = "incorrectFieldValue";
+    public final String INCORRECT_PAGE = "incorrectPage";
 }

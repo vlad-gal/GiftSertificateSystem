@@ -25,5 +25,5 @@ public class GiftCertificateDto extends RepresentationModel<GiftCertificateDto> 
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime lastUpdateDate;
 //    @JsonBackReference
-//    private Set<TagDto> tags;
+    private Set<TagDto> tags;
 }

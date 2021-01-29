@@ -7,9 +7,7 @@ import com.epam.esm.exception.ExceptionPropertyKey;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.TagService;
 import com.epam.esm.validator.TagValidator;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.Level;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,7 +31,7 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @Transactional//+
+    @Transactional
     public TagDto addTag(TagDto tagDto) {
         TagValidator.isValidTag(tagDto);
         Tag addedTag = modelMapper.map(tagDto, Tag.class);
@@ -43,13 +41,13 @@ public class TagServiceImpl implements TagService {
         return modelMapper.map(addedTag, TagDto.class);
     }
 
-    @Override//+
+    @Override
     public Set<TagDto> findAllTags(int limit, int offset) {
         List<Tag> tags = tagDao.findAll(limit, offset);
         return tags.stream().map(tag -> modelMapper.map(tag, TagDto.class)).collect(Collectors.toSet());
     }
 
-    @Override//+
+    @Override
     public TagDto findTagById(long tagId) {
         TagValidator.isValidId(tagId);
         Tag tag = retrieveTag(tagId);
@@ -58,13 +56,13 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @Transactional//+
+    @Transactional
     public void deleteTagById(long tagId) {
         TagValidator.isValidId(tagId);
         tagDao.removeById(tagId);
         log.info("Tag with id = {} deleted", tagId);
     }
-//+
+
     private Tag retrieveTag(long tagId) {
         Optional<Tag> optionalTag = tagDao.findById(tagId);
         return optionalTag.orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.TAG_WITH_ID_NOT_FOUND,
