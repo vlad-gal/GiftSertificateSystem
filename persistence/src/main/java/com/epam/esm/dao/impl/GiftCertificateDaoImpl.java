@@ -39,28 +39,18 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public GiftCertificate update(GiftCertificate entity) {
-        GiftCertificate merge = entityManager.merge(entity);
+        GiftCertificate updatedGiftCertificate = entityManager.merge(entity);
         entityManager.flush();
-        return merge;
+        return updatedGiftCertificate;
     }
 
     @Override
-    public List<GiftCertificate> findCertificatesByQueryParameters(Map<String, String> queryParameter) {
-        int page = Integer.parseInt(queryParameter.get(PAGE));
-        int perPage = Integer.parseInt(queryParameter.get(PER_PAGE));
+    public List<GiftCertificate> findAllByParameters(Map<String, String> queryParameters) {
+        int page = Integer.parseInt(queryParameters.get(PAGE));
+        int perPage = Integer.parseInt(queryParameters.get(PER_PAGE));
         int firstResult = page == 1 ? 0 : page * perPage - 2;
-        String query = QueryManager.createQueryForCertificates(queryParameter);
+        String query = QueryManager.createQueryForCertificates(queryParameters);
         return entityManager.createQuery(JPQLQuery.SELECT_ALL_CERTIFICATES + query, GiftCertificate.class)
                 .setFirstResult(firstResult).setMaxResults(perPage).getResultList();
     }
-
-//    @Override
-//    public List<GiftCertificate> findCertificatesByQueryParameters(QueryParameter queryParameter, int limit, int offset) {
-//        String query = QueryParameterManager.createQuery(queryParameter);
-//        Query nativeQuery = entityManager.createNativeQuery(query);
-////        nativeQuery.setFirstResult();
-////        nativeQuery.setMaxResults();
-////        return jdbcTemplate.query(SqlQuery.SELECT_CERTIFICATES_BY_PARAMETERS + query, giftCertificateMapper);
-//        throw new GeneratedKeysNotFoundException("Generated id not found");
-//    }
 }

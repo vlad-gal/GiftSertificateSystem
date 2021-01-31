@@ -20,6 +20,10 @@ import java.util.Properties;
 @ComponentScan("com.epam.esm")
 @ConfigurationProperties("spring.datasource")
 public class PersistenceConfig {
+    private static final String PACKAGE_TO_SCAN = "com.epam.esm.entity";
+    private static final String HIBERNATE_DIALECT = "hibernate.dialect";
+    private static final String HIBERNATE_SHOW_SQL = "hibernate.show_sql";
+    private static final String HIBERNATE_FORMAT_SQL = "hibernate.format_sql";
     @Setter
     private String driverClassName;
     @Setter
@@ -65,12 +69,12 @@ public class PersistenceConfig {
     public LocalContainerEntityManagerFactoryBean managerFactory(DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
         entityManager.setDataSource(dataSource);
-        entityManager.setPackagesToScan("com.epam.esm.entity");
+        entityManager.setPackagesToScan(PACKAGE_TO_SCAN);
         entityManager.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
         Properties hibernateProperties = new Properties();
-        hibernateProperties.put("hibernate.dialect", dialect);
-        hibernateProperties.put("hibernate.show_sql", showSql);
-        hibernateProperties.put("hibernate.format_sql", formatSql);
+        hibernateProperties.put(HIBERNATE_DIALECT, dialect);
+        hibernateProperties.put(HIBERNATE_SHOW_SQL, showSql);
+        hibernateProperties.put(HIBERNATE_FORMAT_SQL, formatSql);
         entityManager.setJpaProperties(hibernateProperties);
         return entityManager;
     }

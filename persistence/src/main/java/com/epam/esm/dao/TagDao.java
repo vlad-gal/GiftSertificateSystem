@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TagDao extends BaseDao<Tag> {
-    List<Tag> findAll(int limit, int offset);
 
     List<Tag> findAll();
 

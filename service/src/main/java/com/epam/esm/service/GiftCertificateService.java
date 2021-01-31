@@ -17,7 +17,6 @@ public interface GiftCertificateService {
     GiftCertificateDto findGiftCertificateById(long id);
 
     List<GiftCertificateDto> findGiftCertificatesByParameters(Map<String, String> queryParameters);
-//    List<GiftCertificateDto> findGiftCertificatesByParameters(QueryParameterDto queryParameter, int limit, int offset);
 
     void deleteGiftCertificateById(long id);
 

@@ -9,8 +9,12 @@ import java.util.Map;
 public class ParameterManager {
     private final String REGEX_TAG_NAME = "tagName";
     private final String COMMA = ",";
+    private final String PAGE = "page";
+    private final String PER_PAGE = "per_page";
+    private final String DEFAULT_PAGE = "1";
+    private final String DEFAULT_PER_PAGE = "10";
 
-    public Map<String, String> queryParametersProcessing(Map<String, String> queryParameters) {
+    public Map<String, String> giftCertificateQueryParametersProcessing(Map<String, String> queryParameters) {
         Map<String, String> processedParameters = new HashMap<>();
         queryParameters.forEach((key, value) -> {
             if (key.equalsIgnoreCase(REGEX_TAG_NAME)) {
@@ -26,13 +30,22 @@ public class ParameterManager {
             }
         });
         queryParameters.remove(REGEX_TAG_NAME);
-        if (!queryParameters.containsKey("page")) {
-            processedParameters.put("page", "1");
-        }
-        if (!queryParameters.containsKey("per_page")) {
-            processedParameters.put("per_page", "10");
-        }
+        createDefaultPageNumber(processedParameters);
         processedParameters.putAll(queryParameters);
         return processedParameters;
+    }
+
+    public Map<String, String> defaultQueryParametersProcessing(Map<String, String> queryParameters) {
+        createDefaultPageNumber(queryParameters);
+        return queryParameters;
+    }
+
+    private void createDefaultPageNumber(Map<String, String> processedParameters) {
+        if (!processedParameters.containsKey(PAGE)) {
+            processedParameters.put(PAGE, DEFAULT_PAGE);
+        }
+        if (!processedParameters.containsKey(PER_PAGE)) {
+            processedParameters.put(PER_PAGE, DEFAULT_PER_PAGE);
+        }
     }
 }

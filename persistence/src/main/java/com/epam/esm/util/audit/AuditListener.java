@@ -14,6 +14,9 @@ public class AuditListener {
             GiftCertificate giftCertificate = (GiftCertificate) object;
             giftCertificate.setCreatedDate(LocalDateTime.now());
             giftCertificate.setLastUpdateDate(LocalDateTime.now());
+        } else if (object instanceof Order){
+            Order order = (Order) object;
+            order.setPurchaseDate(LocalDateTime.now());
         }
     }
 
@@ -22,9 +25,6 @@ public class AuditListener {
         if (object instanceof GiftCertificate){
             GiftCertificate giftCertificate = (GiftCertificate) object;
             giftCertificate.setLastUpdateDate(LocalDateTime.now());
-        } else if (object instanceof Order){
-            Order order = (Order) object;
-            order.setPurchaseDate(LocalDateTime.now());
         }
     }
 }

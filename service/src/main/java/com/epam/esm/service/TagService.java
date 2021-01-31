@@ -2,11 +2,12 @@ package com.epam.esm.service;
 
 import com.epam.esm.dto.TagDto;
 
-import java.util.Set;
+import java.util.List;
+import java.util.Map;
 
 public interface TagService {
 
-    Set<TagDto> findAllTags(int limit, int offset);
+    List<TagDto> findAllTagsByParameters(Map<String, String> queryParameters);
 
     TagDto findTagById(long id);
 

@@ -1,7 +1,5 @@
 package com.epam.esm.dto;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,10 +18,7 @@ public class GiftCertificateDto extends RepresentationModel<GiftCertificateDto> 
     private String description;
     private BigDecimal price;
     private int duration;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime createdDate;
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime lastUpdateDate;
-//    @JsonBackReference
     private Set<TagDto> tags;
 }

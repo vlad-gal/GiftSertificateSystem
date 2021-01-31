@@ -7,8 +7,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * The {@code TagController} class is an endpoint of the API
@@ -52,7 +52,7 @@ public class TagController {
      * @param tagDto Tag to be inserted into storage. Inferred from the request body.
      * @return {@link ResponseEntity} with the inserted tag and its location included.
      */
-    @PostMapping//+
+    @PostMapping
     public ResponseEntity<TagDto> addTag(@RequestBody TagDto tagDto) {
         TagDto addedTagDto = tagService.addTag(tagDto);
         return new ResponseEntity<>(addedTagDto, HttpStatus.OK);
@@ -70,7 +70,7 @@ public class TagController {
      * @param id Identifier of the requested tag. Inferred from the request URI.
      * @return {@link ResponseEntity} with found tag.
      */
-    @GetMapping("/{id}")//+
+    @GetMapping("/{id}")
     public ResponseEntity<TagDto> findTagById(@PathVariable("id") long id) {
         TagDto tagDto = tagService.findTagById(id);
         return new ResponseEntity<>(tagDto, HttpStatus.OK);
@@ -85,11 +85,9 @@ public class TagController {
      *
      * @return {@link ResponseEntity} with the list of the gift certificates.
      */
-    @GetMapping//+
-    public ResponseEntity<Set<TagDto>> findAllTags
-    (@RequestParam Map<String, String> queryParameters, @RequestParam(value = "limit", required = false, defaultValue = "10") int limit,
-     @RequestParam(value = "offset", required = false, defaultValue = "0") int offset) {
-        Set<TagDto> tagsDto = tagService.findAllTags(limit, offset);
+    @GetMapping
+    public ResponseEntity<List<TagDto>> findAllTagsByParameters(@RequestParam Map<String, String> queryParameters) {
+        List<TagDto> tagsDto = tagService.findAllTagsByParameters(queryParameters);
         return new ResponseEntity<>(tagsDto, HttpStatus.OK);
     }
 
@@ -105,7 +103,7 @@ public class TagController {
      *
      * @param id The identifier of the tag to be deleted. Inferred from the request URI.
      */
-    @DeleteMapping("/{id}")//+
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteTagById(@PathVariable("id") long id) {
         tagService.deleteTagById(id);

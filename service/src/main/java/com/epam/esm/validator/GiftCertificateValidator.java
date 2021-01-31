@@ -9,9 +9,8 @@ import lombok.experimental.UtilityClass;
 import java.math.BigDecimal;
 
 @UtilityClass
-public class GiftCertificateValidator {
+public class GiftCertificateValidator extends BaseValidator{
     private final String REGEX_NAME_AND_DESCRIPTION = "[а-яА-Я\\w\\s\\d\\.,?!]{1,250}";
-    private final long MIN_ID = 1;
     private final BigDecimal MIN_PRICE = new BigDecimal("0.01");
     private final BigDecimal MAX_PRICE = new BigDecimal("1000000");
     private final int MIN_DURATION = 1;
@@ -22,12 +21,6 @@ public class GiftCertificateValidator {
         isValidDescription(giftCertificateDto.getDescription());
         isValidPrice(giftCertificateDto.getPrice());
         isValidDuration(giftCertificateDto.getDuration());
-    }
-
-    public void isValidId(long id) {
-        if (id < MIN_ID) {
-            throw new ValidationException(ExceptionPropertyKey.INCORRECT_ID, id);
-        }
     }
 
     private void isValidName(String name) {

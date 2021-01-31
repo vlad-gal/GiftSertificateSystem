@@ -18,7 +18,6 @@ public class User {
     private String login;
     private String firstName;
     private String lastName;
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinColumn(name = ColumnName.ORDER_ID)
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "user")
     private List<Order> orders;
 }

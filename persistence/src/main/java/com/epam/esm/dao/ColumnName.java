@@ -40,5 +40,5 @@ public class ColumnName {
     Joined tables
      */
     public final String CERTIFICATES_HAS_TAGS_TABLE = "certificates_has_tags";
-    public final String ORDERS_HAS_GIFT_CERTIFICATES_TABLE = "orders_has_gift_certificate";
+    public final String ORDERS_HAS_GIFT_CERTIFICATE_TABLE = "orders_has_gift_certificate";
 }

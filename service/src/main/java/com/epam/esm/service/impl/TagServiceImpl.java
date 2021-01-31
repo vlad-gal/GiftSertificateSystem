@@ -6,6 +6,8 @@ import com.epam.esm.entity.Tag;
 import com.epam.esm.exception.ExceptionPropertyKey;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.TagService;
+import com.epam.esm.util.ParameterManager;
+import com.epam.esm.validator.QueryParameterValidator;
 import com.epam.esm.validator.TagValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -14,8 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -42,12 +44,16 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    public Set<TagDto> findAllTags(int limit, int offset) {
-        List<Tag> tags = tagDao.findAll(limit, offset);
-        return tags.stream().map(tag -> modelMapper.map(tag, TagDto.class)).collect(Collectors.toSet());
+    @Transactional
+    public List<TagDto> findAllTagsByParameters(Map<String, String> queryParameters) {
+        Map<String, String> processedQueryParameters = ParameterManager.defaultQueryParametersProcessing(queryParameters);
+        QueryParameterValidator.isValidTagQueryParameters(processedQueryParameters);
+        List<Tag> tags = tagDao.findAllByParameters(processedQueryParameters);
+        return tags.stream().map(tag -> modelMapper.map(tag, TagDto.class)).collect(Collectors.toList());
     }
 
     @Override
+    @Transactional
     public TagDto findTagById(long tagId) {
         TagValidator.isValidId(tagId);
         Tag tag = retrieveTag(tagId);

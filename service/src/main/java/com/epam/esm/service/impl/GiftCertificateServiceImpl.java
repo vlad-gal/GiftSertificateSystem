@@ -39,7 +39,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    @Transactional//+
+    @Transactional
     public GiftCertificateDto addGiftCertificate(GiftCertificateDto giftCertificateDto) {
         GiftCertificateValidator.isValidGiftCertificate(giftCertificateDto);
         Set<Tag> existTag = new HashSet<>();
@@ -74,7 +74,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    @Transactional//+
+    @Transactional
     public Set<TagDto> addTagToGiftCertificate(long giftCertificateId, TagDto tagDto) {
         GiftCertificateValidator.isValidId(giftCertificateId);
         TagValidator.isValidTag(tagDto);
@@ -94,7 +94,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 .stream().map(t -> modelMapper.map(t, TagDto.class)).collect(Collectors.toSet());
     }
 
-    @Override//+
+    @Override
     @Transactional
     public GiftCertificateDto findGiftCertificateById(long id) {
         GiftCertificateValidator.isValidId(id);
@@ -103,50 +103,37 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         return modelMapper.map(giftCertificate, GiftCertificateDto.class);
     }
 
-    @Override//+
+    @Override
     @Transactional
     public Set<TagDto> findGiftCertificateTags(long certificateId) {
         GiftCertificateValidator.isValidId(certificateId);
         GiftCertificate giftCertificate = checkAndGetGiftCertificate(certificateId);
         Set<Tag> tags = giftCertificate.getTags();
-        return tags.stream().map(t -> modelMapper.map(t, TagDto.class)).collect(Collectors.toSet());
+        return tags.stream().map(tag -> modelMapper.map(tag, TagDto.class)).collect(Collectors.toSet());
     }
 
-    @Override//-
+    @Override
     @Transactional
     public List<GiftCertificateDto> findGiftCertificatesByParameters(Map<String, String> queryParameters) {
-        Map<String, String> processedQueryParameters = ParameterManager.queryParametersProcessing(queryParameters);
-        QueryParameterValidator.isValidQueryParameters(processedQueryParameters);
+        Map<String, String> processedQueryParameters = ParameterManager.giftCertificateQueryParametersProcessing(queryParameters);
+        QueryParameterValidator.isValidGiftCertificateQueryParameters(processedQueryParameters);
         log.debug("Query parameter: {}", processedQueryParameters);
         List<GiftCertificate> giftCertificates = giftCertificateDao
-                .findCertificatesByQueryParameters(processedQueryParameters);
+                .findAllByParameters(processedQueryParameters);
         return giftCertificates.stream()
                 .map(giftCertificate -> modelMapper.map(giftCertificate, GiftCertificateDto.class))
                 .collect(Collectors.toList());
     }
 
-
-//    @Override
-//    @Transactional
-//    public List<GiftCertificateDto> findGiftCertificatesByParameters(QueryParameterDto queryParameter, int limit, int offset) {
-//        QueryParameterValidator.isValidQueryParameters(queryParameter);
-//        log.debug("Query parameter: {}", queryParameter);
-//        List<GiftCertificate> giftCertificates = giftCertificateDao
-//                .findCertificatesByQueryParameters(modelMapper.map(queryParameter, QueryParameter.class), limit, offset);
-//        return giftCertificates.stream()
-//                .map(giftCertificate -> modelMapper.map(giftCertificate, GiftCertificateDto.class))
-//                .collect(Collectors.toList());
-//    }
-
     @Override
-    @Transactional//+
+    @Transactional
     public void deleteGiftCertificateById(long id) {
         GiftCertificateValidator.isValidId(id);
         giftCertificateDao.removeById(id);
     }
 
     @Override
-    @Transactional//++
+    @Transactional
     public void deleteTagFromGiftCertificate(long certificateId, long tagId) {
         GiftCertificateValidator.isValidId(certificateId);
         TagValidator.isValidId(tagId);
@@ -157,7 +144,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    @Transactional//+
+    @Transactional
     public GiftCertificateDto updateGiftCertificate(long giftCertificateId, GiftCertificateDto giftCertificateDto) {
         GiftCertificateValidator.isValidId(giftCertificateId);
         GiftCertificateValidator.isValidGiftCertificate(giftCertificateDto);
@@ -167,7 +154,19 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         log.info("Gift certificate with id = {} updated", giftCertificateId);
         return modelMapper.map(giftCertificate, GiftCertificateDto.class);
     }
-//+
+
+    @Override
+    @Transactional
+    public GiftCertificateDto updateGiftCertificateField(long giftCertificateId, GiftCertificateField giftCertificateField) {
+        GiftCertificateValidator.isValidId(giftCertificateId);
+        GiftCertificateValidator.isValidField(giftCertificateField);
+        GiftCertificate giftCertificate = checkAndGetGiftCertificate(giftCertificateId);
+        updateField(giftCertificateField, giftCertificate);
+        giftCertificateDao.update(giftCertificate);
+        log.info("Gift certificate with id = {} updated", giftCertificateId);
+        return modelMapper.map(giftCertificate, GiftCertificateDto.class);
+    }
+
     private void updateFields(GiftCertificateDto receivedGiftCertificate, GiftCertificate updatedGiftCertificate) {
         updatedGiftCertificate.setName(receivedGiftCertificate.getName());
         updatedGiftCertificate.setDescription(receivedGiftCertificate.getDescription());
@@ -195,18 +194,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         log.debug("Updated gift certificate: {}", updatedGiftCertificate);
     }
 
-    @Override
-    @Transactional//+
-    public GiftCertificateDto updateGiftCertificateField(long giftCertificateId, GiftCertificateField giftCertificateField) {
-        GiftCertificateValidator.isValidId(giftCertificateId);
-        GiftCertificateValidator.isValidField(giftCertificateField);
-        GiftCertificate giftCertificate = checkAndGetGiftCertificate(giftCertificateId);
-        updateField(giftCertificateField, giftCertificate);
-        giftCertificateDao.update(giftCertificate);
-        log.info("Gift certificate with id = {} updated", giftCertificateId);
-        return modelMapper.map(giftCertificate, GiftCertificateDto.class);
-    }
-//+
     private void updateField(GiftCertificateField giftCertificateField, GiftCertificate updatedGiftCertificate) {
         GiftCertificateField.FieldName fieldName = GiftCertificateField.FieldName.valueOf(giftCertificateField.getFieldName().toUpperCase());
         switch (fieldName) {
@@ -224,17 +211,17 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                 break;
         }
     }
-//+
+
     private boolean checkIfTagAlreadyExist(Tag tag) {
         return tagDao.findAll().contains(tag);
     }
-//+
+
     private GiftCertificate checkAndGetGiftCertificate(long id) {
         Optional<GiftCertificate> giftCertificateOptional = giftCertificateDao.findById(id);
         return giftCertificateOptional
                 .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.GIFT_CERTIFICATE_WITH_ID_NOT_FOUND, id));
     }
-//+
+
     private Tag checkAndGetTag(long id) {
         Optional<Tag> tagOptionalOptional = tagDao.findById(id);
         return tagOptionalOptional

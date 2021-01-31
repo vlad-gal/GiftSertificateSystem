@@ -33,8 +33,7 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(ValidationException.class)
     public ResponseEntity<ErrorHandler> handleValidationException(ValidationException exception, Locale locale) {
-        String message = messageSource.getMessage(exception.getMessageKey(), exception.getMessageValues(),
-                locale);
+        String message = messageSource.getMessage(exception.getMessageKey(), exception.getMessageValues(), locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
         log.error("ValidationException message: {}", message);
         return new ResponseEntity<>(errorHandler, HttpStatus.BAD_REQUEST);
@@ -43,8 +42,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorHandler> handleResourceNotFoundException(ResourceNotFoundException exception,
                                                                         Locale locale) {
-        String message = messageSource.getMessage(exception.getMessageKey(), new Object[]{exception.getMessageValue()},
-                locale);
+        String message = messageSource.getMessage(exception.getMessageKey(), exception.getMessageValues(), locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.NOT_FOUND);
         log.error("ResourceNotFoundException message: {}", message);
         return new ResponseEntity<>(errorHandler, HttpStatus.NOT_FOUND);
@@ -80,7 +78,7 @@ public class RestExceptionHandler {
             HttpMessageNotReadableException exception, Locale locale) {
         String message = messageSource.getMessage(BODY_MISSING, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
-        log.error("HttpMessageNotReadableException message: {}", exception.getMessage());
+        log.error("HttpMessageNotReadableException message: {}", exception);
         return new ResponseEntity<>(errorHandler, HttpStatus.BAD_REQUEST);
     }
 
