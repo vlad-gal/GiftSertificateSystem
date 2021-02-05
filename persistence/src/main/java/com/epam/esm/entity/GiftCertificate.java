@@ -39,7 +39,6 @@ public class GiftCertificate {
             joinColumns = @JoinColumn(name = ColumnName.CERTIFICATE_ID),
             inverseJoinColumns = @JoinColumn(name = ColumnName.TAG_ID))
     private Set<Tag> tags;
-
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = ColumnName.ORDERS_HAS_GIFT_CERTIFICATE_TABLE,
             joinColumns = @JoinColumn(name = ColumnName.CERTIFICATE_ID),

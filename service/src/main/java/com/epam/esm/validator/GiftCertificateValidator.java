@@ -9,7 +9,7 @@ import lombok.experimental.UtilityClass;
 import java.math.BigDecimal;
 
 @UtilityClass
-public class GiftCertificateValidator extends BaseValidator{
+public class GiftCertificateValidator extends BaseValidator {
     private final String REGEX_NAME_AND_DESCRIPTION = "[а-яА-Я\\w\\s\\d\\.,?!]{1,250}";
     private final BigDecimal MIN_PRICE = new BigDecimal("0.01");
     private final BigDecimal MAX_PRICE = new BigDecimal("1000000");

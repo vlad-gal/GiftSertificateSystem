@@ -1,12 +1,14 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.GiftCertificateDao;
+import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.GiftCertificateField;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.CannotDeleteResourceException;
 import com.epam.esm.exception.ExceptionPropertyKey;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.GiftCertificateService;
@@ -29,13 +31,16 @@ import java.util.stream.Collectors;
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateDao giftCertificateDao;
     private final TagDao tagDao;
+    private final OrderDao orderDao;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public GiftCertificateServiceImpl(GiftCertificateDao giftCertificateDao, ModelMapper modelMapper, TagDao tagDao) {
+    public GiftCertificateServiceImpl(GiftCertificateDao giftCertificateDao, TagDao tagDao, OrderDao orderDao,
+                                      ModelMapper modelMapper) {
         this.giftCertificateDao = giftCertificateDao;
         this.modelMapper = modelMapper;
         this.tagDao = tagDao;
+        this.orderDao = orderDao;
     }
 
     @Override
@@ -118,8 +123,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         Map<String, String> processedQueryParameters = ParameterManager.giftCertificateQueryParametersProcessing(queryParameters);
         QueryParameterValidator.isValidGiftCertificateQueryParameters(processedQueryParameters);
         log.debug("Query parameter: {}", processedQueryParameters);
-        List<GiftCertificate> giftCertificates = giftCertificateDao
-                .findAllByParameters(processedQueryParameters);
+        List<GiftCertificate> giftCertificates = giftCertificateDao.findAllByParameters(processedQueryParameters);
         return giftCertificates.stream()
                 .map(giftCertificate -> modelMapper.map(giftCertificate, GiftCertificateDto.class))
                 .collect(Collectors.toList());
@@ -129,6 +133,9 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     @Transactional
     public void deleteGiftCertificateById(long id) {
         GiftCertificateValidator.isValidId(id);
+        if (orderDao.checkIfCertificateUsed(id)) {
+            throw new CannotDeleteResourceException(ExceptionPropertyKey.CANNOT_DELETE_GIFT_CERTIFICATE, id);
+        }
         giftCertificateDao.removeById(id);
     }
 

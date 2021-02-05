@@ -22,4 +22,6 @@ public class ExceptionPropertyKey {
     public final String USER_WITH_ID_NOT_FOUND = "userWithIdNotFound";
     public final String USER_ORDER_NOT_FOUND = "userOrderNotFound";
     public final String USER_WITH_HIGHEST_COST_ORDERS_NOT_FOUND = "userWithHighestCostOrdersNotFound";
+    public final String ORDER_WITH_ID_NOT_FOUND = "orderWithIdNotFound";
+    public final String CANNOT_DELETE_GIFT_CERTIFICATE = "cannotDeleteGiftCertificate";
 }

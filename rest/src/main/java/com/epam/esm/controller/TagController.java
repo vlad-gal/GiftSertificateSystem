@@ -1,8 +1,11 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.controller.assembler.TagAssembler;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.TagService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +32,7 @@ import java.util.Map;
 @RequestMapping("/tags")
 public class TagController {
     private final TagService tagService;
+    private final TagAssembler tagAssembler;
 
     /**
      * Injects an object of a class implementing {@link TagService}.
@@ -36,8 +40,9 @@ public class TagController {
      * @param tagService An object of a class implementing {@link TagService}.
      */
     @Autowired
-    public TagController(TagService tagService) {
+    public TagController(TagService tagService, TagAssembler tagAssembler) {
         this.tagService = tagService;
+        this.tagAssembler = tagAssembler;
     }
 
     /**
@@ -71,9 +76,9 @@ public class TagController {
      * @return {@link ResponseEntity} with found tag.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<TagDto> findTagById(@PathVariable("id") long id) {
+    public ResponseEntity<EntityModel<TagDto>> findTagById(@PathVariable("id") long id) {
         TagDto tagDto = tagService.findTagById(id);
-        return new ResponseEntity<>(tagDto, HttpStatus.OK);
+        return new ResponseEntity<>(tagAssembler.toModel(tagDto), HttpStatus.OK);
     }
 
     /**
@@ -86,9 +91,9 @@ public class TagController {
      * @return {@link ResponseEntity} with the list of the gift certificates.
      */
     @GetMapping
-    public ResponseEntity<List<TagDto>> findAllTagsByParameters(@RequestParam Map<String, String> queryParameters) {
+    public ResponseEntity<CollectionModel<EntityModel<TagDto>>> findAllTagsByParameters(@RequestParam(required = false) Map<String, String> queryParameters) {
         List<TagDto> tagsDto = tagService.findAllTagsByParameters(queryParameters);
-        return new ResponseEntity<>(tagsDto, HttpStatus.OK);
+        return new ResponseEntity<>(tagAssembler.toCollectionModel(tagsDto), HttpStatus.OK);
     }
 
     /**
@@ -104,8 +109,8 @@ public class TagController {
      * @param id The identifier of the tag to be deleted. Inferred from the request URI.
      */
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteTagById(@PathVariable("id") long id) {
+    public ResponseEntity<HttpStatus> deleteTagById(@PathVariable("id") long id) {
         tagService.deleteTagById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -1,5 +1,6 @@
 package com.epam.esm.dto;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -20,5 +21,6 @@ public class GiftCertificateDto extends RepresentationModel<GiftCertificateDto> 
     private int duration;
     private LocalDateTime createdDate;
     private LocalDateTime lastUpdateDate;
+    @JsonBackReference
     private Set<TagDto> tags;
 }

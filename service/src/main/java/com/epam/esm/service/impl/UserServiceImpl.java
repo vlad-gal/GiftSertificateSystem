@@ -30,7 +30,7 @@ public class UserServiceImpl implements UserService {
     private final OrderDao orderDao;
     private final ModelMapper modelMapper;
 
-    public UserServiceImpl(UserDao userDao, ModelMapper modelMapper, OrderDao orderDao) {
+    public UserServiceImpl(UserDao userDao, OrderDao orderDao, ModelMapper modelMapper) {
         this.userDao = userDao;
         this.modelMapper = modelMapper;
         this.orderDao = orderDao;

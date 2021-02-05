@@ -6,7 +6,7 @@ import com.epam.esm.exception.ValidationException;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class UserValidator extends BaseValidator{
+public class UserValidator extends BaseValidator {
     private final String REGEX_NAME = "[A-ZА-Я][а-яa-z]{1,19}";
     private final String REGEX_LOGIN = "\\w{1,20}";
 

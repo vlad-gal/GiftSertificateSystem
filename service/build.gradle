@@ -6,5 +6,4 @@ dependencies {
     implementation("org.springframework:spring-orm")
     implementation("org.hibernate:hibernate-core")
     implementation('org.springframework.boot:spring-boot-starter-hateoas')
-
 }

@@ -5,12 +5,8 @@ import org.modelmapper.config.Configuration;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-
-import javax.persistence.EntityManagerFactory;
 
 @Component
 @ComponentScan("com.epam.esm")
@@ -24,10 +20,5 @@ public class ServiceConfig {
                 .setSkipNullEnabled(true)
                 .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
         return modelMapper;
-    }
-
-    @Bean
-    public PlatformTransactionManager transactionManager(EntityManagerFactory entityManagerFactory) {
-        return new JpaTransactionManager(entityManagerFactory);
     }
 }

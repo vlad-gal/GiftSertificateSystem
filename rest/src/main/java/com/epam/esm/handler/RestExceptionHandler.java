@@ -1,5 +1,6 @@
 package com.epam.esm.handler;
 
+import com.epam.esm.exception.CannotDeleteResourceException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ValidationException;
 import lombok.extern.slf4j.Slf4j;
@@ -48,6 +49,14 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorHandler, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(CannotDeleteResourceException.class)
+    public ResponseEntity<ErrorHandler> handleCannotDeleteResourceException(CannotDeleteResourceException exception, Locale locale) {
+        String message = messageSource.getMessage(exception.getMessageKey(), exception.getMessageValues(), locale);
+        ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
+        log.error("CannotDeleteResourceException message: {}", message);
+        return new ResponseEntity<>(errorHandler, HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(TypeMismatchException.class)
     public ResponseEntity<ErrorHandler> handleTypeMismatchException(TypeMismatchException exception, Locale locale) {
         String message = messageSource.getMessage(INCORRECT_TYPE, null, locale);
@@ -74,11 +83,11 @@ public class RestExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    public ResponseEntity<ErrorHandler> handleHttpMessageNotReadableException(
-            HttpMessageNotReadableException exception, Locale locale) {
+    public ResponseEntity<ErrorHandler> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception,
+                                                                              Locale locale) {
         String message = messageSource.getMessage(BODY_MISSING, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
-        log.error("HttpMessageNotReadableException message: {}", exception);
+        log.error("HttpMessageNotReadableException message: {}", exception.getMessage());
         return new ResponseEntity<>(errorHandler, HttpStatus.BAD_REQUEST);
     }
 
@@ -86,7 +95,7 @@ public class RestExceptionHandler {
     public ResponseEntity<ErrorHandler> handleException(Exception exception, Locale locale) {
         String message = messageSource.getMessage(INTERNAL_ERROR, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.INTERNAL_ERROR);
-        log.error("Exception message: {}", exception);
+        log.error("Exception message: {}", exception.getMessage());
         return new ResponseEntity<>(errorHandler, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

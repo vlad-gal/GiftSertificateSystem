@@ -30,7 +30,6 @@ public class Order {
             joinColumns = @JoinColumn(name = ColumnName.ORDER_ID),
             inverseJoinColumns = @JoinColumn(name = ColumnName.CERTIFICATE_ID))
     private List<GiftCertificate> giftCertificates;
-
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinColumn(name = ColumnName.USER_ID)

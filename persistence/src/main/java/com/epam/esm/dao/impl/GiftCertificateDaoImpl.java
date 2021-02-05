@@ -41,6 +41,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     public GiftCertificate update(GiftCertificate entity) {
         GiftCertificate updatedGiftCertificate = entityManager.merge(entity);
         entityManager.flush();
+        entityManager.clear();
         return updatedGiftCertificate;
     }
 

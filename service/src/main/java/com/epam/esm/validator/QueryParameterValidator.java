@@ -13,7 +13,7 @@ public class QueryParameterValidator {
     private final String REGEX_GIFT_CERTIFICATE_NAME_AND_DESCRIPTION_VALUE = "[а-яА-Я\\w\\s\\d\\.,?!]{1,250}";
     private final String REGEX_GIFT_CERTIFICATE_NAME_KEY = "name";
     private final String REGEX_GIFT_CERTIFICATE_DESCRIPTION_KEY = "description";
-    private final String REGEX_ORDER_VALUE = "[-]?name|[-]?description|[-]?id";
+    private final String REGEX_ORDER_VALUE = "[-]?name|[-]?description|[-]?id|[-]?first_name|[-]?last_name|[-]?login";
     private final String REGEX_ORDER_KEY = "order";
     private final String REGEX_PAGE_KEY = "page";
     private final String REGEX_PER_PAGE_KEY = "per_page";
@@ -43,6 +43,7 @@ public class QueryParameterValidator {
                 isValidTagName(value);
             }
         });
+        isValidOrderType(queryParameters.get(REGEX_ORDER_KEY));
         isValidPage(queryParameters.get(REGEX_PAGE_KEY));
         isValidPage(queryParameters.get(REGEX_PER_PAGE_KEY));
     }
@@ -51,6 +52,7 @@ public class QueryParameterValidator {
         isValidName(queryParameters.get(REGEX_FIRST_NAME_KEY));
         isValidName(queryParameters.get(REGEX_LAST_NAME_KEY));
         isValidLogin(queryParameters.get(REGEX_LOGIN_KEY));
+        isValidOrderType(queryParameters.get(REGEX_ORDER_KEY));
         isValidPage(queryParameters.get(REGEX_PAGE_KEY));
         isValidPage(queryParameters.get(REGEX_PER_PAGE_KEY));
     }

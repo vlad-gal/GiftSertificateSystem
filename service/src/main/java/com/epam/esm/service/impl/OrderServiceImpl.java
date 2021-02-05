@@ -4,6 +4,7 @@ import com.epam.esm.dao.GiftCertificateDao;
 import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dao.UserDao;
+import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.GiftCertificate;
@@ -14,6 +15,7 @@ import com.epam.esm.exception.ExceptionPropertyKey;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.validator.GiftCertificateValidator;
+import com.epam.esm.validator.OrderValidator;
 import com.epam.esm.validator.UserValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -24,6 +26,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -35,7 +38,7 @@ public class OrderServiceImpl implements OrderService {
     private final ModelMapper modelMapper;
 
     public OrderServiceImpl(TagDao tagDao, OrderDao orderDao, UserDao userDao,
-                            ModelMapper modelMapper, GiftCertificateDao giftCertificateDao) {
+                            GiftCertificateDao giftCertificateDao, ModelMapper modelMapper) {
         this.tagDao = tagDao;
         this.orderDao = orderDao;
         this.userDao = userDao;
@@ -56,7 +59,9 @@ public class OrderServiceImpl implements OrderService {
         });
         BigDecimal cost = giftCertificates.stream().map(giftCertificate -> giftCertificate.getPrice())
                 .reduce(BigDecimal::add).get();
-        User user = checkAndGetUser(userId);
+        User user = userDao.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.USER_WITH_ID_NOT_FOUND, userId));
+        ;
         Order order = new Order();
         order.setUser(user);
         order.setGiftCertificates(giftCertificates);
@@ -64,6 +69,23 @@ public class OrderServiceImpl implements OrderService {
         long orderId = orderDao.add(order);
         order.setOrderId(orderId);
         return modelMapper.map(order, OrderDto.class);
+    }
+
+    @Override
+    public OrderDto findOrderById(long orderId) {
+        OrderValidator.isValidId(orderId);
+        Optional<Order> optionalOrder = orderDao.findById(orderId);
+        Order order = optionalOrder.orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.ORDER_WITH_ID_NOT_FOUND, orderId));
+        return modelMapper.map(order, OrderDto.class);
+    }
+
+    @Override
+    @Transactional
+    public List<GiftCertificateDto> findOrderGiftCertificates(long orderId) {
+        OrderValidator.isValidId(orderId);
+        List<GiftCertificate> giftCertificates = orderDao.findOrderGiftCertificates(orderId);
+        return giftCertificates.stream()
+                .map(giftCertificate -> modelMapper.map(giftCertificate, GiftCertificateDto.class)).collect(Collectors.toList());
     }
 
     @Override
@@ -76,11 +98,5 @@ public class OrderServiceImpl implements OrderService {
         Tag foundTag = tagDao.findById(tagId)
                 .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.TAG_WITH_ID_NOT_FOUND, tagId));
         return modelMapper.map(foundTag, TagDto.class);
-    }
-
-    private User checkAndGetUser(long id) {
-        Optional<User> userOptional = userDao.findById(id);
-        return userOptional
-                .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.USER_WITH_ID_NOT_FOUND, id));
     }
 }

@@ -2,6 +2,7 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.JPQLQuery;
 import com.epam.esm.dao.OrderDao;
+import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import org.springframework.stereotype.Repository;
 
@@ -42,6 +43,20 @@ public class OrderDaoImpl implements OrderDao {
     public Optional<Order> findUserOrder(long userId, long orderId) {
         return Optional.ofNullable(entityManager.createQuery(JPQLQuery.SELECT_USER_ORDER, Order.class)
                 .setParameter(1, userId).setParameter(2, orderId).getSingleResult());
+    }
+
+    @Override
+    public List<GiftCertificate> findOrderGiftCertificates(long orderId) {
+        return entityManager.createQuery(JPQLQuery.SELECT_ORDER_GIFT_CERTIFICATES, GiftCertificate.class)
+                .setParameter(1, orderId).getResultList();
+    }
+
+    @Override
+    public boolean checkIfCertificateUsed(long certificateId) {
+        List<Order> orders = entityManager
+                .createQuery(JPQLQuery.SELECT_ORDER_WITH_USED_GIFT_CERTIFICATES, Order.class)
+                .setParameter(1, certificateId).getResultList();
+        return !orders.isEmpty();
     }
 
     @Override
