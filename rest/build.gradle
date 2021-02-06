@@ -2,7 +2,8 @@ dependencies {
     implementation project(':service')
     implementation('org.springframework.boot:spring-boot-starter-web')
     implementation('org.springframework.boot:spring-boot-starter-hateoas')
+    implementation('org.springframework.boot:spring-boot-starter-actuator')
 }
-bootJar {
-    enabled = true
+bootRun{
+    mainClass = 'com.epam.esm.GiftCertificateSystem'
 }

@@ -2,21 +2,22 @@ plugins {
     id 'org.springframework.boot' version "${spring_boot_version}"
     id 'io.spring.dependency-management' version "${spring_dependency_management_version}"
 }
+
 allprojects {
     group 'com.epam.esm'
-    version '1.0-SNAPSHOT'
-}
-springBoot{
-    mainClass = 'com.epam.esm.GiftCertificateSystem'
-}
-subprojects {
-    apply plugin: 'org.springframework.boot'
-    apply plugin: 'io.spring.dependency-management'
-    apply plugin: 'java'
-    sourceCompatibility = '1.8'
+    version '2.0-SNAPSHOT'
     repositories {
         mavenCentral()
     }
+}
+
+subprojects {
+    apply plugin: 'java-library'
+    apply plugin: 'org.springframework.boot'
+    apply plugin: 'io.spring.dependency-management'
+
+    sourceCompatibility = '1.8'
+
     dependencies {
         compileOnly 'org.projectlombok:lombok'
         annotationProcessor 'org.projectlombok:lombok'
@@ -26,14 +27,4 @@ subprojects {
     test {
         useJUnitPlatform()
     }
-    bootJar {
-        enabled = false
-    }
-    jar{
-        enabled = true
-    }
-
 }
-//bootRun{
-//    systemProperty 'spring.profiles.active', 'dev'
-//}

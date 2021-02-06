@@ -5,3 +5,12 @@ dependencies {
     implementation("org.springframework:spring-orm")
     testCompile("com.h2database:h2")
 }
+bootJar {
+    enabled = false
+}
+jar{
+    enabled = true
+}
+bootRun{
+    enabled = false
+}

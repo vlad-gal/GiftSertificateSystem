@@ -7,3 +7,12 @@ dependencies {
     implementation("org.hibernate:hibernate-core")
     implementation('org.springframework.boot:spring-boot-starter-hateoas')
 }
+bootJar {
+    enabled = false
+}
+jar{
+    enabled = true
+}
+bootRun{
+    enabled = false
+}
