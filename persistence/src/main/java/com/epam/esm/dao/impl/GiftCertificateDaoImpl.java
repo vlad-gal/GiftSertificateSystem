@@ -49,7 +49,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
     public List<GiftCertificate> findAllByParameters(Map<String, String> queryParameters) {
         int page = Integer.parseInt(queryParameters.get(PAGE));
         int perPage = Integer.parseInt(queryParameters.get(PER_PAGE));
-        int firstResult = page == 1 ? 0 : page * perPage - 2;
+        int firstResult = page == 1 ? 0 : page * perPage - perPage;
         String query = QueryManager.createQueryForCertificates(queryParameters);
         return entityManager.createQuery(JPQLQuery.SELECT_ALL_CERTIFICATES + query, GiftCertificate.class)
                 .setFirstResult(firstResult).setMaxResults(perPage).getResultList();

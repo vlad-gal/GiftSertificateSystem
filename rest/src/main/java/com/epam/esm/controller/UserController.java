@@ -162,10 +162,10 @@ public class UserController {
      * @return {@link ResponseEntity} with the made order and its location included.
      */
     @PostMapping("/{id}/orders")
-    public ResponseEntity<OrderDto> makeOrder(@PathVariable("id") long userId,
-                                              @RequestBody List<Long> giftCertificateIds) {
+    public ResponseEntity<EntityModel<OrderDto>> makeOrder(@PathVariable("id") long userId,
+                                                           @RequestBody List<Long> giftCertificateIds) {
         OrderDto order = orderService.makeOrder(userId, giftCertificateIds);
-        return new ResponseEntity<>(order, HttpStatus.CREATED);
+        return new ResponseEntity<>(orderAssembler.toModel(order), HttpStatus.CREATED);
     }
 
     /**

@@ -34,7 +34,8 @@ public class GiftCertificate {
     private LocalDateTime createdDate;
     @Column(name = ColumnName.LAST_UPDATE_DATE)
     private LocalDateTime lastUpdateDate;
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            fetch = FetchType.EAGER)
     @JoinTable(name = ColumnName.CERTIFICATES_HAS_TAGS_TABLE,
             joinColumns = @JoinColumn(name = ColumnName.CERTIFICATE_ID),
             inverseJoinColumns = @JoinColumn(name = ColumnName.TAG_ID))

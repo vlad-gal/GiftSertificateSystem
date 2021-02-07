@@ -77,9 +77,9 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the inserted gift certificate and its location included.
      */
     @PostMapping
-    public ResponseEntity<GiftCertificateDto> addGiftCertificate(@RequestBody GiftCertificateDto giftCertificateDto) {
+    public ResponseEntity<EntityModel<GiftCertificateDto>> addGiftCertificate(@RequestBody GiftCertificateDto giftCertificateDto) {
         GiftCertificateDto addedGiftCertificateDto = giftCertificateService.addGiftCertificate(giftCertificateDto);
-        return new ResponseEntity<>(addedGiftCertificateDto, HttpStatus.CREATED);
+        return new ResponseEntity<>(giftCertificateAssembler.toModel(addedGiftCertificateDto), HttpStatus.CREATED);
     }
 
     /**
@@ -97,10 +97,10 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the set of tags which belongs to the gift certificate.
      */
     @PutMapping("/{id}/tags")
-    public ResponseEntity<Set<TagDto>> addTagToGiftCertificate(@PathVariable("id") long giftCertificateId,
-                                                               @RequestBody TagDto tagDto) {
+    public ResponseEntity<CollectionModel<EntityModel<TagDto>>> addTagToGiftCertificate(@PathVariable("id") long giftCertificateId,
+                                                                                        @RequestBody TagDto tagDto) {
         Set<TagDto> tags = giftCertificateService.addTagToGiftCertificate(giftCertificateId, tagDto);
-        return new ResponseEntity<>(tags, HttpStatus.OK);
+        return new ResponseEntity<>(tagAssembler.toCollectionModel(tags), HttpStatus.OK);
     }
 
     /**
@@ -189,11 +189,11 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the updated gift certificate.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<GiftCertificateDto> updateGiftCertificate(@PathVariable("id") long giftCertificateId,
-                                                                    @RequestBody GiftCertificateDto giftCertificateDto) {
+    public ResponseEntity<EntityModel<GiftCertificateDto>> updateGiftCertificate(@PathVariable("id") long giftCertificateId,
+                                                                                 @RequestBody GiftCertificateDto giftCertificateDto) {
         GiftCertificateDto updatedGiftCertificateDto = giftCertificateService
                 .updateGiftCertificate(giftCertificateId, giftCertificateDto);
-        return new ResponseEntity<>(updatedGiftCertificateDto, HttpStatus.OK);
+        return new ResponseEntity<>(giftCertificateAssembler.toModel(updatedGiftCertificateDto), HttpStatus.OK);
     }
 
     /**
@@ -211,11 +211,11 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the updated gift certificate.
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<GiftCertificateDto> updateGiftCertificateField(@PathVariable("id") long giftCertificateId,
-                                                                         @RequestBody GiftCertificateField giftCertificateField) {
+    public ResponseEntity<EntityModel<GiftCertificateDto>> updateGiftCertificateField(@PathVariable("id") long giftCertificateId,
+                                                                                      @RequestBody GiftCertificateField giftCertificateField) {
         GiftCertificateDto updatedGiftCertificateDto = giftCertificateService
                 .updateGiftCertificateField(giftCertificateId, giftCertificateField);
-        return new ResponseEntity<>(updatedGiftCertificateDto, HttpStatus.OK);
+        return new ResponseEntity<>(giftCertificateAssembler.toModel(updatedGiftCertificateDto), HttpStatus.OK);
     }
 
     /**
@@ -252,7 +252,8 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with http status - 204 (NO CONTENT).
      */
     @DeleteMapping("/{id}/tags/{tagId}")
-    public ResponseEntity<HttpStatus> deleteTagFromGiftCertificate(@PathVariable("id") long certificateId, @PathVariable("tagId") long tagId) {
+    public ResponseEntity<HttpStatus> deleteTagFromGiftCertificate(@PathVariable("id") long certificateId,
+                                                                   @PathVariable("tagId") long tagId) {
         giftCertificateService.deleteTagFromGiftCertificate(certificateId, tagId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

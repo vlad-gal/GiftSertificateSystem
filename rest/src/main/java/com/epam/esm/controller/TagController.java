@@ -59,9 +59,9 @@ public class TagController {
      * @return {@link ResponseEntity} with the inserted tag and its location included.
      */
     @PostMapping
-    public ResponseEntity<TagDto> addTag(@RequestBody TagDto tagDto) {
+    public ResponseEntity<EntityModel<TagDto>> addTag(@RequestBody TagDto tagDto) {
         TagDto addedTagDto = tagService.addTag(tagDto);
-        return new ResponseEntity<>(addedTagDto, HttpStatus.CREATED);
+        return new ResponseEntity<>(tagAssembler.toModel(addedTagDto), HttpStatus.CREATED);
     }
 
     /**

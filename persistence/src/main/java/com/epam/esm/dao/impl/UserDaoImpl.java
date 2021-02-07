@@ -24,7 +24,7 @@ public class UserDaoImpl implements UserDao {
     public List<User> findAllByParameters(Map<String, String> queryParameters) {
         int page = Integer.parseInt(queryParameters.get(PAGE));
         int perPage = Integer.parseInt(queryParameters.get(PER_PAGE));
-        int firstResult = page == 1 ? 0 : page * perPage - 2;
+        int firstResult = page == 1 ? 0 : page * perPage - perPage;
         String query = QueryManager.createQueryForUsers(queryParameters);
         return entityManager.createQuery(JPQLQuery.SELECT_ALL_USERS + query, User.class)
                 .setFirstResult(firstResult)
