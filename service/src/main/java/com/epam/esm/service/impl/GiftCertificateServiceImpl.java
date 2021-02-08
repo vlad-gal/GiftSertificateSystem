@@ -171,7 +171,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         updateField(giftCertificateField, giftCertificate);
         giftCertificateDao.update(giftCertificate);
         log.info("Gift certificate with id = {} updated", giftCertificateId);
-        return modelMapper.map(giftCertificate, GiftCertificateDto.class);
+        return modelMapper.map(checkAndGetGiftCertificate(giftCertificateId), GiftCertificateDto.class);
     }
 
     private void updateFields(GiftCertificateDto receivedGiftCertificate, GiftCertificate updatedGiftCertificate) {
