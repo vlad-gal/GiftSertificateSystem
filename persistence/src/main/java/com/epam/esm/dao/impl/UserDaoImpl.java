@@ -1,6 +1,5 @@
 package com.epam.esm.dao.impl;
 
-import com.epam.esm.dao.JPQLQuery;
 import com.epam.esm.dao.UserDao;
 import com.epam.esm.entity.User;
 import com.epam.esm.util.QueryManager;
@@ -16,6 +15,9 @@ import java.util.Optional;
 public class UserDaoImpl implements UserDao {
     private static final String PAGE = "page";
     private static final String PER_PAGE = "per_page";
+    private static final String SELECT_ALL_USERS = "SELECT u FROM User u ";
+    private static final String SELECT_USER_WITH_HIGHEST_COST_OF_ALL_ORDERS =
+            "SELECT o.user FROM Order o GROUP BY o.user.userId ORDER BY SUM(o.cost) DESC ";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -26,7 +28,7 @@ public class UserDaoImpl implements UserDao {
         int perPage = Integer.parseInt(queryParameters.get(PER_PAGE));
         int firstResult = page == 1 ? 0 : page * perPage - perPage;
         String query = QueryManager.createQueryForUsers(queryParameters);
-        return entityManager.createQuery(JPQLQuery.SELECT_ALL_USERS + query, User.class)
+        return entityManager.createQuery(SELECT_ALL_USERS + query, User.class)
                 .setFirstResult(firstResult)
                 .setMaxResults(perPage)
                 .getResultList();
@@ -34,7 +36,7 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> findUserWithHighestCostOfAllOrders() {
-        User foundUser = entityManager.createQuery(JPQLQuery.SELECT_USER_WITH_HIGHEST_COST_OF_ALL_ORDERS, User.class)
+        User foundUser = entityManager.createQuery(SELECT_USER_WITH_HIGHEST_COST_OF_ALL_ORDERS, User.class)
                 .setMaxResults(1).getSingleResult();
         return Optional.ofNullable(foundUser);
     }

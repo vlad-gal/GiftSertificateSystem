@@ -1,7 +1,6 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.GiftCertificateDao;
-import com.epam.esm.dao.JPQLQuery;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.util.QueryManager;
 import org.springframework.stereotype.Repository;
@@ -16,6 +15,8 @@ import java.util.Optional;
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
     private static final String PAGE = "page";
     private static final String PER_PAGE = "per_page";
+    private static final String SELECT_ALL_CERTIFICATES = "SELECT DISTINCT g FROM GiftCertificate g ";
+    private static final String DELETE_GIFT_CERTIFICATE_BY_ID = "DELETE FROM GiftCertificate WHERE id = ?1";
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -33,7 +34,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
 
     @Override
     public void removeById(long id) {
-        entityManager.createQuery(JPQLQuery.DELETE_GIFT_CERTIFICATE_BY_ID)
+        entityManager.createQuery(DELETE_GIFT_CERTIFICATE_BY_ID)
                 .setParameter(1, id).executeUpdate();
     }
 
@@ -51,7 +52,7 @@ public class GiftCertificateDaoImpl implements GiftCertificateDao {
         int perPage = Integer.parseInt(queryParameters.get(PER_PAGE));
         int firstResult = page == 1 ? 0 : page * perPage - perPage;
         String query = QueryManager.createQueryForCertificates(queryParameters);
-        return entityManager.createQuery(JPQLQuery.SELECT_ALL_CERTIFICATES + query, GiftCertificate.class)
+        return entityManager.createQuery(SELECT_ALL_CERTIFICATES + query, GiftCertificate.class)
                 .setFirstResult(firstResult).setMaxResults(perPage).getResultList();
     }
 }
