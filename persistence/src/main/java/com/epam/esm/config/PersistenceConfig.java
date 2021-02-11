@@ -3,6 +3,8 @@ package com.epam.esm.config;
 import com.mchange.v2.c3p0.ComboPooledDataSource;
 import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
+import org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -19,50 +21,36 @@ import org.springframework.transaction.PlatformTransactionManager;
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.beans.PropertyVetoException;
-import java.util.Properties;
 
 @Configuration
 @ComponentScan("com.epam.esm")
-@ConfigurationProperties("spring.datasource")
+@ConfigurationProperties("spring.c3p0")
 public class PersistenceConfig {
     private static final String PACKAGE_TO_SCAN = "com.epam.esm.entity";
-    private static final String HIBERNATE_DIALECT = "hibernate.dialect";
-    private static final String HIBERNATE_SHOW_SQL = "hibernate.show_sql";
-    private static final String HIBERNATE_FORMAT_SQL = "hibernate.format_sql";
     @Setter
-    private String driverClassName;
+    private String driverClass;
     @Setter
-    private String url;
+    private String jdbcUrl;
     @Setter
-    private String username;
+    private String user;
     @Setter
     private String password;
-    @Setter
-    private String showSql;
-    @Setter
-    private String dialect;
-    @Setter
-    private String formatSql;
 
-    @Profile("dev")
     @Bean
+    @Profile("dev")
+    @ConfigurationProperties(prefix = "spring.datasource")
     public DataSource developmentDataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(driverClassName);
-        dataSource.setUrl(url);
-        dataSource.setUsername(username);
-        dataSource.setPassword(password);
-        return dataSource;
+        return DataSourceBuilder.create().type(DriverManagerDataSource.class).build();
     }
 
-    @Profile("prod")
     @Bean
+    @Profile("prod")
     public DataSource productionDataSource() {
         ComboPooledDataSource dataSource = new ComboPooledDataSource();
         try {
-            dataSource.setDriverClass(driverClassName);
-            dataSource.setJdbcUrl(url);
-            dataSource.setUser(username);
+            dataSource.setDriverClass(driverClass);
+            dataSource.setJdbcUrl(jdbcUrl);
+            dataSource.setUser(user);
             dataSource.setPassword(password);
             return dataSource;
         } catch (PropertyVetoException e) {
@@ -79,17 +67,9 @@ public class PersistenceConfig {
 
     @Profile(value = {"dev", "prod"})
     @Bean
-    public LocalContainerEntityManagerFactoryBean managerFactory(DataSource dataSource) {
-        LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
-        entityManager.setDataSource(dataSource);
-        entityManager.setPackagesToScan(PACKAGE_TO_SCAN);
-        entityManager.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
-        Properties hibernateProperties = new Properties();
-        hibernateProperties.put(HIBERNATE_DIALECT, dialect);
-        hibernateProperties.put(HIBERNATE_SHOW_SQL, showSql);
-        hibernateProperties.put(HIBERNATE_FORMAT_SQL, formatSql);
-        entityManager.setJpaProperties(hibernateProperties);
-        return entityManager;
+    public LocalContainerEntityManagerFactoryBean managerFactory(DataSource dataSource,
+                                                                 EntityManagerFactoryBuilder entityManagerFactoryBuilder) {
+        return entityManagerFactoryBuilder.dataSource(dataSource).packages(PACKAGE_TO_SCAN).build();
     }
 
     @Profile("test")
