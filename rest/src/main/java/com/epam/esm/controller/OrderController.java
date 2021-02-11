@@ -55,15 +55,15 @@ public class OrderController {
     /**
      * Returns the list of gift certificates which belongs to order with the specified identifier from the storage.
      * <p>
-     * Annotated by {@link GetMapping} with parameter value = "/{id}/gift_certificates". Therefore, processes GET requests at
-     * /orders/{id}/gift_certificates, where id is the identifier of the requested order represented by a natural number.
+     * Annotated by {@link GetMapping} with parameter value = "/{id}/certificates". Therefore, processes GET requests at
+     * /orders/{id}/certificates, where id is the identifier of the requested order represented by a natural number.
      * <p>
      * The default response status is 200 - OK.
      *
      * @param orderId Identifier of the requested order. Inferred from the request URI.
      * @return {@link ResponseEntity} with the list of gift certificates which belongs to the order.
      */
-    @GetMapping("/{id}/gift_certificates")
+    @GetMapping("/{id}/certificates")
     public ResponseEntity<CollectionModel<EntityModel<GiftCertificateDto>>> findOrderGiftCertificates
     (@PathVariable("id") long orderId) {
         List<GiftCertificateDto> giftCertificates = orderService.findOrderGiftCertificates(orderId);

@@ -171,14 +171,14 @@ public class UserController {
     /**
      * Returns the most widely used tag of a user with the highest cost of all orders.
      * <p>
-     * Annotated by {@link GetMapping} with parameter value = "/top_tag".
+     * Annotated by {@link GetMapping} with parameter value = "/top-tag".
      * <p>
      * If there is no tag response gets status 404 - Not Found.
      * The default response status is 200 - OK.
      *
      * @return {@link ResponseEntity} with the most widely used tag of a user with the highest cost of all orders.
      */
-    @GetMapping("/top_tag")
+    @GetMapping("/top-tag")
     public ResponseEntity<EntityModel<TagDto>> mostWidelyUsedTag() {
         TagDto mostWidelyUsedTag = orderService.mostWidelyUsedTagWithHighestCostOfAllOrders();
         return new ResponseEntity<>(tagAssembler.toModel(mostWidelyUsedTag), HttpStatus.OK);
