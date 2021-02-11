@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class TagDto extends RepresentationModel<TagDto> {
     private long tagId;

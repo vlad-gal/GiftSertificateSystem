@@ -1,10 +1,10 @@
 package com.epam.esm.exception;
 
-public class CannotDeleteResourceException extends RuntimeException {
+public class DeleteResourceException extends RuntimeException {
     private String messageKey;
     private Object[] messageValues;
 
-    public CannotDeleteResourceException(String messageKey, Object... messageValues) {
+    public DeleteResourceException(String messageKey, Object... messageValues) {
         this.messageKey = messageKey;
         this.messageValues = messageValues;
     }

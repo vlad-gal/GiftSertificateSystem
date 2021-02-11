@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class GiftCertificateDto extends RepresentationModel<GiftCertificateDto> {
     private long id;

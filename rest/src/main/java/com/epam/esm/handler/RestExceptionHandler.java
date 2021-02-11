@@ -1,6 +1,6 @@
 package com.epam.esm.handler;
 
-import com.epam.esm.exception.CannotDeleteResourceException;
+import com.epam.esm.exception.DeleteResourceException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.ValidationException;
 import lombok.extern.slf4j.Slf4j;
@@ -20,11 +20,11 @@ import java.util.Locale;
 @Slf4j
 @RestControllerAdvice
 public class RestExceptionHandler {
-    public static final String INCORRECT_TYPE = "incorrectType";
-    public static final String PAGE_NOT_FOUND = "pageNotFound";
-    public static final String METHOD_NOT_SUPPORT = "methodNotSupport";
-    public static final String BODY_MISSING = "bodyIsMissing";
-    public static final String INTERNAL_ERROR = "internalError";
+    private static final String INCORRECT_TYPE = "incorrectType";
+    private static final String PAGE_NOT_FOUND = "pageNotFound";
+    private static final String METHOD_NOT_SUPPORT = "methodNotSupport";
+    private static final String BODY_MISSING = "bodyIsMissing";
+    private static final String INTERNAL_ERROR = "internalError";
     private final MessageSource messageSource;
 
     @Autowired
@@ -49,8 +49,8 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorHandler, HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(CannotDeleteResourceException.class)
-    public ResponseEntity<ErrorHandler> handleCannotDeleteResourceException(CannotDeleteResourceException exception, Locale locale) {
+    @ExceptionHandler(DeleteResourceException.class)
+    public ResponseEntity<ErrorHandler> handleCannotDeleteResourceException(DeleteResourceException exception, Locale locale) {
         String message = messageSource.getMessage(exception.getMessageKey(), exception.getMessageValues(), locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
         log.error("CannotDeleteResourceException message: {}", message);

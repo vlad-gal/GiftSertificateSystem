@@ -11,7 +11,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 public class OrderDto extends RepresentationModel<OrderDto> {
     private long orderId;

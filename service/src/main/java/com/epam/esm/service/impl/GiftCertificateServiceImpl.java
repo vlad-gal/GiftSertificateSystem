@@ -8,7 +8,7 @@ import com.epam.esm.dto.GiftCertificateField;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.CannotDeleteResourceException;
+import com.epam.esm.exception.DeleteResourceException;
 import com.epam.esm.exception.ExceptionPropertyKey;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.GiftCertificateService;
@@ -134,7 +134,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     public void deleteGiftCertificateById(long id) {
         GiftCertificateValidator.isValidId(id);
         if (orderDao.checkIfCertificateUsed(id)) {
-            throw new CannotDeleteResourceException(ExceptionPropertyKey.CANNOT_DELETE_GIFT_CERTIFICATE, id);
+            throw new DeleteResourceException(ExceptionPropertyKey.CANNOT_DELETE_GIFT_CERTIFICATE, id);
         }
         giftCertificateDao.removeById(id);
     }
