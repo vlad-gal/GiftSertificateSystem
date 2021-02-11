@@ -20,11 +20,11 @@ import java.util.Locale;
 @Slf4j
 @RestControllerAdvice
 public class RestExceptionHandler {
-    private static final String INCORRECT_TYPE = "incorrectType";
-    private static final String PAGE_NOT_FOUND = "pageNotFound";
-    private static final String METHOD_NOT_SUPPORT = "methodNotSupport";
-    private static final String BODY_MISSING = "bodyIsMissing";
-    private static final String INTERNAL_ERROR = "internalError";
+    private static final String INCORRECT_TYPE = "incorrect.type";
+    private static final String PAGE_NOT_FOUND = "page.not.found";
+    private static final String METHOD_NOT_SUPPORT = "method.not.support";
+    private static final String BODY_MISSING = "body.missing";
+    private static final String INTERNAL_ERROR = "internal.error";
     private final MessageSource messageSource;
 
     @Autowired
