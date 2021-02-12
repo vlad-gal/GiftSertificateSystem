@@ -50,8 +50,8 @@ public class OrderDaoImpl implements OrderDao {
 
     @Override
     public Optional<Order> findUserOrder(long userId, long orderId) {
-        return Optional.ofNullable(entityManager.createQuery(SELECT_USER_ORDER, Order.class)
-                .setParameter(1, userId).setParameter(2, orderId).getSingleResult());
+        return entityManager.createQuery(SELECT_USER_ORDER, Order.class)
+                .setParameter(1, userId).setParameter(2, orderId).getResultStream().findFirst();
     }
 
     @Override

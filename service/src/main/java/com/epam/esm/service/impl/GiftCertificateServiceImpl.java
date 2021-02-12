@@ -100,7 +100,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    @Transactional
     public GiftCertificateDto findGiftCertificateById(long id) {
         GiftCertificateValidator.isValidId(id);
         GiftCertificate giftCertificate = checkAndGetGiftCertificate(id);
@@ -109,7 +108,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    @Transactional
     public Set<TagDto> findGiftCertificateTags(long certificateId) {
         GiftCertificateValidator.isValidId(certificateId);
         GiftCertificate giftCertificate = checkAndGetGiftCertificate(certificateId);
@@ -118,7 +116,6 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
     }
 
     @Override
-    @Transactional
     public List<GiftCertificateDto> findGiftCertificatesByParameters(Map<String, String> queryParameters) {
         Map<String, String> processedQueryParameters = ParameterManager.giftCertificateQueryParametersProcessing(queryParameters);
         QueryParameterValidator.isValidGiftCertificateQueryParameters(processedQueryParameters);

@@ -16,7 +16,6 @@ import com.epam.esm.validator.UserValidator;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -37,7 +36,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public UserDto findUserById(long id) {
         UserValidator.isValidId(id);
         User user = checkAndGetUser(id);
@@ -45,7 +43,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public List<UserDto> findAllUsersByParameters(Map<String, String> queryParameters) {
         Map<String, String> processedQueryParameters = ParameterManager.defaultQueryParametersProcessing(queryParameters);
         QueryParameterValidator.isValidUserQueryParameters(processedQueryParameters);
@@ -55,7 +52,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public List<OrderDto> findUserOrders(long userId) {
         UserValidator.isValidId(userId);
         List<Order> orders = orderDao.findUserOrders(userId);
@@ -63,7 +59,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
     public OrderDto findUserOrder(long userId, long orderId) {
         UserValidator.isValidId(userId);
         OrderValidator.isValidId(orderId);

@@ -60,9 +60,8 @@ public class TagDaoImpl implements TagDao {
 
     @Override
     public Optional<Tag> findTagByName(String name) {
-        Tag foundTag = entityManager.createQuery(SELECT_TAG_BY_NAME, Tag.class)
+        return entityManager.createQuery(SELECT_TAG_BY_NAME, Tag.class)
                 .setParameter(1, name)
-                .getSingleResult();
-        return Optional.ofNullable(foundTag);
+                .getResultStream().findFirst();
     }
 }

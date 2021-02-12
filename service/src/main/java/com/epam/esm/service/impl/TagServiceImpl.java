@@ -44,7 +44,6 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @Transactional
     public List<TagDto> findAllTagsByParameters(Map<String, String> queryParameters) {
         Map<String, String> processedQueryParameters = ParameterManager.defaultQueryParametersProcessing(queryParameters);
         QueryParameterValidator.isValidTagQueryParameters(processedQueryParameters);
@@ -53,7 +52,6 @@ public class TagServiceImpl implements TagService {
     }
 
     @Override
-    @Transactional
     public TagDto findTagById(long tagId) {
         TagValidator.isValidId(tagId);
         Tag tag = retrieveTag(tagId);

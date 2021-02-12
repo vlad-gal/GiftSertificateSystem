@@ -36,9 +36,8 @@ public class UserDaoImpl implements UserDao {
 
     @Override
     public Optional<User> findUserWithHighestCostOfAllOrders() {
-        User foundUser = entityManager.createQuery(SELECT_USER_WITH_HIGHEST_COST_OF_ALL_ORDERS, User.class)
-                .setMaxResults(1).getSingleResult();
-        return Optional.ofNullable(foundUser);
+        return entityManager.createQuery(SELECT_USER_WITH_HIGHEST_COST_OF_ALL_ORDERS, User.class)
+                .setMaxResults(1).getResultStream().findFirst();
     }
 
     @Override

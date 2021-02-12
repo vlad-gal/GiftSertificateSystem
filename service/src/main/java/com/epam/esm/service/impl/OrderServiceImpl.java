@@ -57,11 +57,10 @@ public class OrderServiceImpl implements OrderService {
                     .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.GIFT_CERTIFICATE_WITH_ID_NOT_FOUND, id));
             giftCertificates.add(giftCertificate);
         });
-        BigDecimal cost = giftCertificates.stream().map(giftCertificate -> giftCertificate.getPrice())
+        BigDecimal cost = giftCertificates.stream().map(GiftCertificate::getPrice)
                 .reduce(BigDecimal::add).get();
         User user = userDao.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.USER_WITH_ID_NOT_FOUND, userId));
-        ;
         Order order = new Order();
         order.setUser(user);
         order.setGiftCertificates(giftCertificates);
@@ -80,7 +79,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public List<GiftCertificateDto> findOrderGiftCertificates(long orderId) {
         OrderValidator.isValidId(orderId);
         List<GiftCertificate> giftCertificates = orderDao.findOrderGiftCertificates(orderId);
@@ -89,7 +87,6 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    @Transactional
     public TagDto mostWidelyUsedTagWithHighestCostOfAllOrders() {
         User user = userDao.findUserWithHighestCostOfAllOrders()
                 .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.USER_WITH_HIGHEST_COST_ORDERS_NOT_FOUND));
