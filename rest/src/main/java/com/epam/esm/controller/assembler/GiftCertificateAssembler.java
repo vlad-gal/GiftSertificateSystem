@@ -33,7 +33,7 @@ public class GiftCertificateAssembler implements SimpleRepresentationModelAssemb
         UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn(GiftCertificateController.class)
                 .findGiftCertificatesByParameters(null, 0, 10))
                 .toUriComponentsBuilder()
-                .replaceQuery("{?tagName,name,description,order,page,per_page}");
+                .replaceQuery("{?tagName,name,description,order,page,perPage}");
         uriComponentsBuilder.encode();
         Link link = Link.of(uriComponentsBuilder.toUriString());
         resources.add(link.withRel("find_gift_certificates"));

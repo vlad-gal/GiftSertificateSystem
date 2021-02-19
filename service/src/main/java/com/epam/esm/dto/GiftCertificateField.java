@@ -10,7 +10,6 @@ public class GiftCertificateField {
     @NotBlank
     @FieldNameValue(enumClass = FieldName.class)
     private String fieldName;
-    //    todo придумать аннотацию или обработку
     private String fieldValue;
 
     public enum FieldName {

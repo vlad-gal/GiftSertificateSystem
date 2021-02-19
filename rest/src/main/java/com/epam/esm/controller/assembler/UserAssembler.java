@@ -27,7 +27,7 @@ public class UserAssembler implements SimpleRepresentationModelAssembler<UserDto
         UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn(UserController.class)
                 .findAllUsersByParameters(null, 0, 10))
                 .toUriComponentsBuilder()
-                .replaceQuery("{?first_name,last_name,login,order,page,per_page}");
+                .replaceQuery("{?firstName,lastName,login,order,page,perPage}");
         uriComponentsBuilder.encode();
         Link link = Link.of(uriComponentsBuilder.toUriString());
         resources.add(link.withRel("find_users"));

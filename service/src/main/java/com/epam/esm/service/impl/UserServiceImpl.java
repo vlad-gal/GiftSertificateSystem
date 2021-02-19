@@ -3,7 +3,6 @@ package com.epam.esm.service.impl;
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.Order;
-import com.epam.esm.entity.Tag;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.ExceptionPropertyKey;
 import com.epam.esm.exception.ResourceNotFoundException;
@@ -11,9 +10,7 @@ import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.UserService;
 import com.epam.esm.util.ParameterManager;
-//import com.epam.esm.validator.OrderValidator;
 import com.epam.esm.validator.QueryParameterValidator;
-//import com.epam.esm.validator.UserValidator;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -47,8 +44,8 @@ public class UserServiceImpl implements UserService {
     public List<UserDto> findAllUsersByParameters(Map<String, String> queryParameters, int page, int perPage) {
         QueryParameterValidator.isValidUserQueryParameters(queryParameters);
         Predicate predicate = ParameterManager.createQPredicateForUser(queryParameters);
-        Sort sort = ParameterManager.createSortForUser(queryParameters);
-        Pageable pageable = PageRequest.of(page,perPage,sort);
+        Sort sort = ParameterManager.createSort(queryParameters);
+        Pageable pageable = PageRequest.of(page, perPage, sort);
         Page<User> users;
         if (predicate == null) {
             users = userRepository.findAll(pageable);

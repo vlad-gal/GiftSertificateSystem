@@ -13,10 +13,12 @@ import java.util.Set;
 @NoArgsConstructor
 public class RequestGiftCertificateDto {
     @NotBlank
-    @Pattern(regexp = "[а-яА-Я\\w\\s\\d\\.,?!]{1,250}", message = ExceptionPropertyKey.INCORRECT_GIFT_CERTIFICATE_NAME)
+    @Pattern(regexp = "[а-яА-Я\\w\\s\\d\\.,?!]{1,250}",
+            message = ExceptionPropertyKey.INCORRECT_GIFT_CERTIFICATE_NAME)
     private String name;
     @NotBlank
-    @Pattern(regexp = "[а-яА-Я\\w\\s\\d\\.,?!]{1,250}", message = ExceptionPropertyKey.INCORRECT_GIFT_CERTIFICATE_DESCRIPTION)
+    @Pattern(regexp = "[а-яА-Я\\w\\s\\d\\.,?!]{1,250}",
+            message = ExceptionPropertyKey.INCORRECT_GIFT_CERTIFICATE_DESCRIPTION)
     private String description;
     @DecimalMin(value = "0.01", message = ExceptionPropertyKey.MIN_PRICE)
     @DecimalMax(value = "1000000", message = ExceptionPropertyKey.MAX_PRICE)

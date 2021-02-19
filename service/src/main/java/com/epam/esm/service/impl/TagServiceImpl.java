@@ -44,7 +44,7 @@ public class TagServiceImpl implements TagService {
     public List<TagDto> findAllTagsByParameters(Map<String, String> queryParameters, int page, int perPage) {
         QueryParameterValidator.isValidTagQueryParameters(queryParameters);
         Predicate predicate = ParameterManager.createQPredicateForTag(queryParameters);
-        Sort sort = ParameterManager.createSortForTag(queryParameters);
+        Sort sort = ParameterManager.createSort(queryParameters);
         Pageable pageable = PageRequest.of(page, perPage, sort);
         Page<Tag> tags;
         if (predicate == null) {

@@ -1,7 +1,5 @@
 package com.epam.esm.service.impl;
 
-//import com.epam.esm.dto.GiftCertificateDto;
-
 import com.epam.esm.dto.OrderDto;
 import com.epam.esm.dto.ResponseGiftCertificateDto;
 import com.epam.esm.dto.TagDto;
@@ -16,9 +14,6 @@ import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.repository.TagRepository;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.OrderService;
-//import com.epam.esm.validator.GiftCertificateValidator;
-//import com.epam.esm.validator.OrderValidator;
-//import com.epam.esm.validator.UserValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
@@ -44,10 +39,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     @Transactional
     public OrderDto makeOrder(long userId, List<Long> giftCertificateIds) {
-//        UserValidator.isValidId(userId);
         List<GiftCertificate> giftCertificates = new ArrayList<>();
         giftCertificateIds.forEach(id -> {
-//            GiftCertificateValidator.isValidId(id);
             GiftCertificate giftCertificate = giftCertificateRepository.findById(id)
                     .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.GIFT_CERTIFICATE_WITH_ID_NOT_FOUND, id));
             giftCertificates.add(giftCertificate);
@@ -68,7 +61,8 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderDto findOrderById(long orderId) {
         Optional<Order> optionalOrder = orderRepository.findById(orderId);
-        Order order = optionalOrder.orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.ORDER_WITH_ID_NOT_FOUND, orderId));
+        Order order = optionalOrder.orElseThrow(() ->
+                new ResourceNotFoundException(ExceptionPropertyKey.ORDER_WITH_ID_NOT_FOUND, orderId));
         return modelMapper.map(order, OrderDto.class);
     }
 
@@ -76,7 +70,8 @@ public class OrderServiceImpl implements OrderService {
     public List<ResponseGiftCertificateDto> findOrderGiftCertificates(long orderId) {
         List<GiftCertificate> giftCertificates = orderRepository.findOrderGiftCertificates(orderId);
         return giftCertificates.stream()
-                .map(giftCertificate -> modelMapper.map(giftCertificate, ResponseGiftCertificateDto.class)).collect(Collectors.toList());
+                .map(giftCertificate -> modelMapper.map(giftCertificate, ResponseGiftCertificateDto.class))
+                .collect(Collectors.toList());
     }
 
     @Override

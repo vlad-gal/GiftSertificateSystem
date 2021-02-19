@@ -111,7 +111,7 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
                                                                              int page, int perPage) {
         QueryParameterValidator.isValidGiftCertificateQueryParameters(queryParameters);
         Predicate predicate = ParameterManager.createQPredicateForGiftCertificate(queryParameters);
-        Sort sort = ParameterManager.createSortForGiftCertificate(queryParameters);
+        Sort sort = ParameterManager.createSort(queryParameters);
         Pageable pageable = PageRequest.of(page, perPage, sort);
         Page<GiftCertificate> giftCertificates;
         if (predicate == null) {
