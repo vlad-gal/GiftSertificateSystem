@@ -24,7 +24,7 @@ public class TagAssembler implements SimpleRepresentationModelAssembler<TagDto> 
     public void addLinks(CollectionModel<EntityModel<TagDto>> resources) {
         resources.add(linkTo(methodOn(TagController.class).addTag(null)).withRel("add"));
         UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn(TagController.class)
-                .findAllTagsByParameters(null))
+                .findAllTagsByParameters(null,0,10))
                 .toUriComponentsBuilder()
                 .replaceQuery("{?tagName,page,order,per_page}");
         uriComponentsBuilder.encode();

@@ -2,10 +2,10 @@ package com.epam.esm.controller;
 
 import com.epam.esm.controller.assembler.GiftCertificateAssembler;
 import com.epam.esm.controller.assembler.OrderAssembler;
-import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.OrderDto;
-import com.epam.esm.service.GiftCertificateService;
+import com.epam.esm.dto.ResponseGiftCertificateDto;
 import com.epam.esm.service.OrderService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
@@ -15,7 +15,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.Positive;
 import java.util.List;
+
+//import com.epam.esm.dto.GiftCertificateDto;
 
 /**
  * The {@code OrderController} class is an endpoint of the API
@@ -30,27 +33,14 @@ import java.util.List;
  * @author Uladzislau Halatsevich
  * @version 1.0
  */
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/orders")
 public class OrderController {
     private final OrderService orderService;
     private final GiftCertificateAssembler giftCertificateAssembler;
     private final OrderAssembler orderAssembler;
-
-    /**
-     * Injects an object of a class implementing {@link GiftCertificateService}, gift certificate assembler
-     * {@link GiftCertificateAssembler} and order assembler {@link OrderAssembler}.
-     *
-     * @param orderService             An object of a class implementing {@link OrderService}.
-     * @param giftCertificateAssembler {@link GiftCertificateAssembler} using for create HATEOAS links.
-     * @param orderAssembler           {@link OrderAssembler} using for create HATEOAS links.
-     */
-    public OrderController(OrderService orderService, GiftCertificateAssembler giftCertificateAssembler,
-                           OrderAssembler orderAssembler) {
-        this.orderService = orderService;
-        this.giftCertificateAssembler = giftCertificateAssembler;
-        this.orderAssembler = orderAssembler;
-    }
 
     /**
      * Returns the list of gift certificates which belongs to order with the specified identifier from the storage.
@@ -64,9 +54,9 @@ public class OrderController {
      * @return {@link ResponseEntity} with the list of gift certificates which belongs to the order.
      */
     @GetMapping("/{id}/certificates")
-    public ResponseEntity<CollectionModel<EntityModel<GiftCertificateDto>>> findOrderGiftCertificates
-    (@PathVariable("id") long orderId) {
-        List<GiftCertificateDto> giftCertificates = orderService.findOrderGiftCertificates(orderId);
+    public ResponseEntity<CollectionModel<EntityModel<ResponseGiftCertificateDto>>> findOrderGiftCertificates
+    (@PathVariable("id") @Positive long orderId) {
+        List<ResponseGiftCertificateDto> giftCertificates = orderService.findOrderGiftCertificates(orderId);
         return new ResponseEntity<>(giftCertificateAssembler.toCollectionModel(giftCertificates), HttpStatus.OK);
     }
 
@@ -83,7 +73,7 @@ public class OrderController {
      * @return {@link ResponseEntity} with found order.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<OrderDto>> findOrderById(@PathVariable("id") long orderId) {
+    public ResponseEntity<EntityModel<OrderDto>> findOrderById(@PathVariable("id") @Positive long orderId) {
         OrderDto order = orderService.findOrderById(orderId);
         return new ResponseEntity<>(orderAssembler.toModel(order), HttpStatus.OK);
     }

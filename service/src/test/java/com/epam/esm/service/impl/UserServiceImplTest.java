@@ -71,7 +71,7 @@ class UserServiceImplTest {
 
         when(userDao.findAllByParameters(queryParameters)).thenReturn(Collections.singletonList(user));
 
-        List<UserDto> foundUsers = userService.findAllUsersByParameters(queryParameters);
+        List<UserDto> foundUsers = userService.findAllUsersByParameters(queryParameters, page, perPage);
 
         assertEquals(Collections.singletonList(user),
                 foundUsers.stream().map(userDto -> modelMapper.map(userDto, User.class)).collect(Collectors.toList()));
@@ -81,7 +81,7 @@ class UserServiceImplTest {
     void whenFindAllUsersByParametersThenShouldThrowException() {
         Map<String, String> queryParameters = new HashMap<>();
         queryParameters.put("first_name", "2");
-        assertThrows(ValidationException.class, () -> userService.findAllUsersByParameters(queryParameters));
+        assertThrows(ValidationException.class, () -> userService.findAllUsersByParameters(queryParameters, page, perPage));
     }
 
     @Test

@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface TagService {
 
-    List<TagDto> findAllTagsByParameters(Map<String, String> queryParameters);
+    List<TagDto> findAllTagsByParameters(Map<String, String> queryParameters, int page, int perPage);
 
     TagDto findTagById(long id);
 

@@ -67,7 +67,7 @@ public class PersistenceConfig {
 
     @Profile(value = {"dev", "prod"})
     @Bean
-    public LocalContainerEntityManagerFactoryBean managerFactory(DataSource dataSource,
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource,
                                                                  EntityManagerFactoryBuilder entityManagerFactoryBuilder) {
         return entityManagerFactoryBuilder.dataSource(dataSource).packages(PACKAGE_TO_SCAN).build();
     }

@@ -3,13 +3,16 @@ package com.epam.esm.controller;
 import com.epam.esm.controller.assembler.TagAssembler;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.TagService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 import java.util.Map;
 
@@ -28,23 +31,13 @@ import java.util.Map;
  * @author Uladzislau Halatsevich
  * @version 2.0
  */
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/tags")
 public class TagController {
     private final TagService tagService;
     private final TagAssembler tagAssembler;
-
-    /**
-     * Injects an object of a class implementing {@link TagService} and tag assembler {@link TagAssembler}.
-     *
-     * @param tagService   An object of a class implementing {@link TagService}.
-     * @param tagAssembler {@link TagAssembler} using for create HATEOAS links.
-     */
-    @Autowired
-    public TagController(TagService tagService, TagAssembler tagAssembler) {
-        this.tagService = tagService;
-        this.tagAssembler = tagAssembler;
-    }
 
     /**
      * Inserts the tag passed in the request body into the storage.
@@ -59,7 +52,7 @@ public class TagController {
      * @return {@link ResponseEntity} with the inserted tag and its location included.
      */
     @PostMapping
-    public ResponseEntity<EntityModel<TagDto>> addTag(@RequestBody TagDto tagDto) {
+    public ResponseEntity<EntityModel<TagDto>> addTag(@Valid @RequestBody TagDto tagDto) {
         TagDto addedTagDto = tagService.addTag(tagDto);
         return new ResponseEntity<>(tagAssembler.toModel(addedTagDto), HttpStatus.CREATED);
     }
@@ -77,7 +70,7 @@ public class TagController {
      * @return {@link ResponseEntity} with found tag.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<TagDto>> findTagById(@PathVariable("id") long id) {
+    public ResponseEntity<EntityModel<TagDto>> findTagById(@PathVariable("id") @Positive long id) {
         TagDto tagDto = tagService.findTagById(id);
         return new ResponseEntity<>(tagAssembler.toModel(tagDto), HttpStatus.OK);
     }
@@ -104,8 +97,10 @@ public class TagController {
      */
     @GetMapping
     public ResponseEntity<CollectionModel<EntityModel<TagDto>>> findAllTagsByParameters
-    (@RequestParam(required = false) Map<String, String> queryParameters) {
-        List<TagDto> tagsDto = tagService.findAllTagsByParameters(queryParameters);
+    (@RequestParam(required = false) Map<String, String> queryParameters,
+     @RequestParam(required = false, defaultValue = "0") @PositiveOrZero int page,
+     @RequestParam(required = false, defaultValue = "10") @Positive int perPage) {
+        List<TagDto> tagsDto = tagService.findAllTagsByParameters(queryParameters, page, perPage);
         return new ResponseEntity<>(tagAssembler.toCollectionModel(tagsDto), HttpStatus.OK);
     }
 
@@ -123,7 +118,7 @@ public class TagController {
      * @return {@link ResponseEntity} with http status - 204 (NO CONTENT).
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteTagById(@PathVariable("id") long id) {
+    public ResponseEntity<HttpStatus> deleteTagById(@PathVariable("id") @Positive long id) {
         tagService.deleteTagById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

@@ -1,7 +1,7 @@
 package com.epam.esm.controller.assembler;
 
 import com.epam.esm.controller.GiftCertificateController;
-import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.dto.ResponseGiftCertificateDto;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
@@ -13,9 +13,9 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 @Component
-public class GiftCertificateAssembler implements SimpleRepresentationModelAssembler<GiftCertificateDto> {
+public class GiftCertificateAssembler implements SimpleRepresentationModelAssembler<ResponseGiftCertificateDto> {
     @Override
-    public void addLinks(EntityModel<GiftCertificateDto> resource) {
+    public void addLinks(EntityModel<ResponseGiftCertificateDto> resource) {
         resource.add(linkTo(methodOn(GiftCertificateController.class)
                 .findGiftCertificateById(resource.getContent().getId())).withSelfRel());
         resource.add(linkTo(methodOn(GiftCertificateController.class)
@@ -29,9 +29,9 @@ public class GiftCertificateAssembler implements SimpleRepresentationModelAssemb
     }
 
     @Override
-    public void addLinks(CollectionModel<EntityModel<GiftCertificateDto>> resources) {
+    public void addLinks(CollectionModel<EntityModel<ResponseGiftCertificateDto>> resources) {
         UriComponentsBuilder uriComponentsBuilder = linkTo(methodOn(GiftCertificateController.class)
-                .findGiftCertificatesByParameters(null))
+                .findGiftCertificatesByParameters(null, 0, 10))
                 .toUriComponentsBuilder()
                 .replaceQuery("{?tagName,name,description,order,page,per_page}");
         uriComponentsBuilder.encode();

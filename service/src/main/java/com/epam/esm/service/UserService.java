@@ -10,9 +10,9 @@ public interface UserService {
 
     UserDto findUserById(long id);
 
-    List<UserDto> findAllUsersByParameters(Map<String, String> queryParameters);
+    List<UserDto> findAllUsersByParameters(Map<String, String> queryParameters, int page, int perPage);
 
     List<OrderDto> findUserOrders(long userId);
 
-    OrderDto findUserOrder(long userId, long orderId);
+    OrderDto findUserOrder(long orderId, long userId);
 }

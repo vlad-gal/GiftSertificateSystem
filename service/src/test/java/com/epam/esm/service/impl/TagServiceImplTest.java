@@ -64,7 +64,7 @@ class TagServiceImplTest {
         tag.setName("Hi");
 
         when(tagDao.findAllByParameters(queryParameters)).thenReturn(Collections.singletonList(tag));
-        List<TagDto> allTags = tagService.findAllTagsByParameters(queryParameters);
+        List<TagDto> allTags = tagService.findAllTagsByParameters(queryParameters, page, perPage);
         assertEquals(1, allTags.size());
     }
 
@@ -72,7 +72,7 @@ class TagServiceImplTest {
     void whenAllTagsByParametersThenShouldThrowException() {
         Map<String, String> queryParameters = new HashMap<>();
         queryParameters.put("tagName", "H@@i");
-        assertThrows(ValidationException.class, () -> tagService.findAllTagsByParameters(queryParameters));
+        assertThrows(ValidationException.class, () -> tagService.findAllTagsByParameters(queryParameters, page, perPage));
     }
 
     @Test

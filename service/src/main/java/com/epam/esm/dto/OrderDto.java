@@ -14,8 +14,8 @@ import java.util.List;
 @NoArgsConstructor
 public class OrderDto extends RepresentationModel<OrderDto> {
     private long orderId;
+
     private LocalDateTime purchaseDate;
+
     private BigDecimal cost;
-    @JsonBackReference
-    private List<GiftCertificateDto> giftCertificates;
 }

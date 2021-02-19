@@ -24,4 +24,9 @@ public class ExceptionPropertyKey {
     public final String USER_WITH_HIGHEST_COST_ORDERS_NOT_FOUND = "user.highest.cost.orders.not.found";
     public final String ORDER_WITH_ID_NOT_FOUND = "order.id.not.found";
     public final String CANNOT_DELETE_GIFT_CERTIFICATE = "cannot.delete.gift.certificate";
+    public static final String MIN_DURATION = "";
+    public static final String MAX_DURATION = "";
+    public static final String MAX_PRICE = "";
+    public static final String MIN_PRICE = "";
+
 }

@@ -9,6 +9,7 @@ import com.epam.esm.dto.UserDto;
 import com.epam.esm.service.OrderService;
 import com.epam.esm.service.TagService;
 import com.epam.esm.service.UserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
@@ -16,6 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 import java.util.Map;
 
@@ -34,6 +38,8 @@ import java.util.Map;
  * @author Uladzislau Halatsevich
  * @version 1.0
  */
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -42,27 +48,6 @@ public class UserController {
     private final UserAssembler userAssembler;
     private final TagAssembler tagAssembler;
     private final OrderAssembler orderAssembler;
-
-    /**
-     * Inject objects of classes implementing {@link UserService} and {@link OrderService}.
-     * User assembler {@link UserAssembler}, tag assembler {@link TagAssembler} and
-     * order assembler {@link OrderAssembler}.
-     *
-     * @param userService    An object of a class implementing {@link TagService}.
-     * @param orderService   An object of a class implementing {@link OrderService}.
-     * @param tagAssembler   {@link TagAssembler} using for create HATEOAS links.
-     * @param userAssembler  {@link UserAssembler} using for create HATEOAS links.
-     * @param orderAssembler {@link OrderAssembler} using for create HATEOAS links.
-     */
-    @Autowired
-    public UserController(UserService userService, OrderService orderService, TagAssembler tagAssembler,
-                          UserAssembler userAssembler, OrderAssembler orderAssembler) {
-        this.userService = userService;
-        this.orderService = orderService;
-        this.tagAssembler = tagAssembler;
-        this.userAssembler = userAssembler;
-        this.orderAssembler = orderAssembler;
-    }
 
     /**
      * Returns the user with the specified identifier from the storage.
@@ -77,7 +62,7 @@ public class UserController {
      * @return {@link ResponseEntity} with found user.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<UserDto>> findUserById(@PathVariable("id") long id) {
+    public ResponseEntity<EntityModel<UserDto>> findUserById(@PathVariable("id") @Positive long id) {
         UserDto userDto = userService.findUserById(id);
         return new ResponseEntity<>(userAssembler.toModel(userDto), HttpStatus.OK);
     }
@@ -105,8 +90,10 @@ public class UserController {
      */
     @GetMapping
     public ResponseEntity<CollectionModel<EntityModel<UserDto>>> findAllUsersByParameters
-    (@RequestParam(required = false) Map<String, String> queryParameters) {
-        List<UserDto> allUsers = userService.findAllUsersByParameters(queryParameters);
+    (@RequestParam(required = false) Map<String, String> queryParameters,
+     @RequestParam(required = false, defaultValue = "0") @PositiveOrZero int page,
+     @RequestParam(required = false, defaultValue = "10") @Positive int perPage) {
+        List<UserDto> allUsers = userService.findAllUsersByParameters(queryParameters, page, perPage);
         return new ResponseEntity<>(userAssembler.toCollectionModel(allUsers), HttpStatus.OK);
     }
 
@@ -122,7 +109,7 @@ public class UserController {
      * @return {@link ResponseEntity} with the list of orders which belongs to the user.
      */
     @GetMapping("/{id}/orders")
-    public ResponseEntity<CollectionModel<EntityModel<OrderDto>>> findUserOrders(@PathVariable("id") long userId) {
+    public ResponseEntity<CollectionModel<EntityModel<OrderDto>>> findUserOrders(@PathVariable("id") @Positive long userId) {
         List<OrderDto> orders = userService.findUserOrders(userId);
         return new ResponseEntity<>(orderAssembler.toCollectionModel(orders), HttpStatus.OK);
     }
@@ -141,9 +128,9 @@ public class UserController {
      * @return {@link ResponseEntity} with found order.
      */
     @GetMapping("/{id}/orders/{orderId}")
-    public ResponseEntity<EntityModel<OrderDto>> findUserOrder(@PathVariable("id") long userId,
-                                                               @PathVariable("orderId") long orderId) {
-        OrderDto order = userService.findUserOrder(userId, orderId);
+    public ResponseEntity<EntityModel<OrderDto>> findUserOrder(@PathVariable("id") @Positive long userId,
+                                                               @PathVariable("orderId") @Positive long orderId) {
+        OrderDto order = userService.findUserOrder(orderId, userId);
         return new ResponseEntity<>(orderAssembler.toModel(order), HttpStatus.OK);
     }
 
@@ -162,8 +149,8 @@ public class UserController {
      * @return {@link ResponseEntity} with the made order and its location included.
      */
     @PostMapping("/{id}/orders")
-    public ResponseEntity<EntityModel<OrderDto>> makeOrder(@PathVariable("id") long userId,
-                                                           @RequestBody List<Long> giftCertificateIds) {
+    public ResponseEntity<EntityModel<OrderDto>> makeOrder(@PathVariable("id") @Positive long userId,
+                                                           @RequestBody List<@Positive Long> giftCertificateIds) {
         OrderDto order = orderService.makeOrder(userId, giftCertificateIds);
         return new ResponseEntity<>(orderAssembler.toModel(order), HttpStatus.CREATED);
     }

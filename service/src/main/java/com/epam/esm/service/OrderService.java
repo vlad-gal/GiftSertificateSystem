@@ -1,7 +1,8 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.GiftCertificateDto;
+//import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.ResponseGiftCertificateDto;
 import com.epam.esm.dto.TagDto;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public interface OrderService {
 
     TagDto mostWidelyUsedTagWithHighestCostOfAllOrders();
 
-    List<GiftCertificateDto> findOrderGiftCertificates(long orderId);
+    List<ResponseGiftCertificateDto> findOrderGiftCertificates(long orderId);
 
     OrderDto findOrderById(long orderId);
 }

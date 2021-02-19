@@ -248,7 +248,7 @@ class GiftCertificateServiceImplTest {
 
         when(giftCertificateDao.findAllByParameters(anyMap())).thenReturn(Collections.singletonList(giftCertificate));
 
-        List<GiftCertificateDto> giftCertificatesDto = giftCertificateService.findGiftCertificatesByParameters(queryParameters);
+        List<GiftCertificateDto> giftCertificatesDto = giftCertificateService.findGiftCertificatesByParameters(queryParameters, page, perPage);
 
         assertEquals(Collections.singletonList(giftCertificate), giftCertificatesDto.stream()
                 .map(giftCertificateDto -> modelMapper.map(giftCertificateDto, GiftCertificate.class))
@@ -259,7 +259,7 @@ class GiftCertificateServiceImplTest {
     void whenFindGiftCertificatesByParametersThenShouldThrowException() {
         Map<String, String> queryParameters = new HashMap<>();
         queryParameters.put("name", "!!^%#");
-        assertThrows(ValidationException.class, () -> giftCertificateService.findGiftCertificatesByParameters(queryParameters));
+        assertThrows(ValidationException.class, () -> giftCertificateService.findGiftCertificatesByParameters(queryParameters, page, perPage));
     }
 
     @Test
