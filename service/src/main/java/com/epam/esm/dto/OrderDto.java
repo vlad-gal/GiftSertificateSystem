@@ -11,8 +11,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class OrderDto extends RepresentationModel<OrderDto> {
     private long orderId;
-
     private LocalDateTime purchaseDate;
-
     private BigDecimal cost;
 }

@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -58,25 +57,9 @@ public class OrderServiceImpl implements OrderService {
         return modelMapper.map(order, OrderDto.class);
     }
 
-//    @Override
-//    public OrderDto findOrderById(long orderId) {
-//        Optional<Order> optionalOrder = orderRepository.findById(orderId);
-//        Order order = optionalOrder.orElseThrow(() ->
-//                new ResourceNotFoundException(ExceptionPropertyKey.ORDER_WITH_ID_NOT_FOUND, orderId));
-//        return modelMapper.map(order, OrderDto.class);
-//    }
-//
-//    @Override
-//    public List<ResponseGiftCertificateDto> findOrderGiftCertificates(long orderId) {
-//        List<GiftCertificate> giftCertificates = orderRepository.findOrderGiftCertificates(orderId);
-//        return giftCertificates.stream()
-//                .map(giftCertificate -> modelMapper.map(giftCertificate, ResponseGiftCertificateDto.class))
-//                .collect(Collectors.toList());
-//    }
-
     @Override
     public List<ResponseGiftCertificateDto> findUserOrderGiftCertificates(long userId, long orderId) {
-        List<GiftCertificate> giftCertificates = orderRepository.findUserOrderGiftCertificates(userId,orderId);
+        List<GiftCertificate> giftCertificates = orderRepository.findUserOrderGiftCertificates(userId, orderId);
         return giftCertificates.stream()
                 .map(giftCertificate -> modelMapper.map(giftCertificate, ResponseGiftCertificateDto.class))
                 .collect(Collectors.toList());
@@ -84,9 +67,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public TagDto mostWidelyUsedTagWithHighestCostOfAllOrders() {
-        User user = userRepository.findUserWithHighestCostOfAllOrders().get(0);
+        List<User> users = userRepository.findUserWithHighestCostOfAllOrders();
+        User user = users.stream().findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.USER_WITH_HIGHEST_COST_ORDERS_NOT_FOUND));
         long userId = user.getUserId();
-        long tagId = orderRepository.findMostWidelyUsedTagByUserId(userId).get(0);
+        long tagId = orderRepository.findMostWidelyUsedTagByUserId(userId).stream().findFirst()
+                .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.MOST_WIDELY_USED_TAG_NOT_FOUND));
         Tag foundTag = tagRepository.findById(tagId)
                 .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.TAG_WITH_ID_NOT_FOUND, tagId));
         return modelMapper.map(foundTag, TagDto.class);

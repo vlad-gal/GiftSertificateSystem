@@ -12,9 +12,5 @@ public interface OrderService {
 
     TagDto mostWidelyUsedTagWithHighestCostOfAllOrders();
 
-//    List<ResponseGiftCertificateDto> findOrderGiftCertificates(long orderId);
-
-//    OrderDto findOrderById(long orderId);
-
     List<ResponseGiftCertificateDto> findUserOrderGiftCertificates(long userId, long orderId);
 }

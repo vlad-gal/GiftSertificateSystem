@@ -47,12 +47,4 @@ public class AuthenticationController {
         return new ResponseEntity<>(new AuthenticateResponseDto(user.getLogin(), token), HttpStatus.OK);
 
     }
-
-    @PostMapping("/logout")
-    @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<HttpStatus> logout(HttpServletRequest request, HttpServletResponse response) {
-        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-        logoutHandler.logout(request, response, null);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
 }

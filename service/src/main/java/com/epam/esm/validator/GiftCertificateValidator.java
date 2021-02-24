@@ -10,10 +10,8 @@ import java.math.BigDecimal;
 @UtilityClass
 public class GiftCertificateValidator {
     private final String REGEX_NAME_AND_DESCRIPTION = "[а-яА-Я\\w\\s\\d\\.,?!]{1,250}";
-    private final BigDecimal MIN_PRICE = new BigDecimal("0.01");
-    private final BigDecimal MAX_PRICE = new BigDecimal("1000000");
-    private final int MIN_DURATION = 1;
-    private final int MAX_DURATION = 30;
+    private final String REGEX_PRICE = "(0\\.\\d{1,2})|([1-9]\\d{0,5}(\\.\\d{1,2})?)|(1000000)";
+    private final String REGEX_DURATION = "([1-9])|([1-2]\\d)|(30)";
 
     public void isValidField(GiftCertificateField giftCertificateField) {
         GiftCertificateField.FieldName fieldName = GiftCertificateField.FieldName.valueOf(giftCertificateField.getFieldName().toUpperCase());
@@ -25,10 +23,10 @@ public class GiftCertificateValidator {
                 isValidDescription(giftCertificateField.getFieldValue());
                 break;
             case PRICE:
-                isValidPrice(new BigDecimal(giftCertificateField.getFieldValue()));
+                isValidPrice(giftCertificateField.getFieldValue());
                 break;
             case DURATION:
-                isValidDuration(Integer.parseInt(giftCertificateField.getFieldValue()));
+                isValidDuration(giftCertificateField.getFieldValue());
                 break;
         }
     }
@@ -45,14 +43,14 @@ public class GiftCertificateValidator {
         }
     }
 
-    private void isValidPrice(BigDecimal price) {
-        if (price == null || price.compareTo(MIN_PRICE) < 0 || price.compareTo(MAX_PRICE) > 0) {
+    private void isValidPrice(String price) {
+        if (price == null || price.isEmpty() || !price.matches(REGEX_PRICE)) {
             throw new ValidationException(ExceptionPropertyKey.INCORRECT_PRICE, price);
         }
     }
 
-    private void isValidDuration(int duration) {
-        if (duration < MIN_DURATION || duration > MAX_DURATION) {
+    private void isValidDuration(String duration) {
+        if (duration == null || duration.isEmpty() || !duration.matches(REGEX_DURATION)) {
             throw new ValidationException(ExceptionPropertyKey.INCORRECT_DURATION, duration);
         }
     }

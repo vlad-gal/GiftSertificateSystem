@@ -1,1 +1,1 @@
-MJC-School Module #3. REST API Advanced
+MJC-School Module #4. Authentication & Spring Security

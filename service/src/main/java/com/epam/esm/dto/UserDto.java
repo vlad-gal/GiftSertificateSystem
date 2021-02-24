@@ -2,7 +2,6 @@ package com.epam.esm.dto;
 
 import com.epam.esm.exception.ExceptionPropertyKey;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.hateoas.RepresentationModel;
 
@@ -21,9 +20,9 @@ public class UserDto extends RepresentationModel<UserDto> {
     @Pattern(regexp = "\\w{1,20}", message = ExceptionPropertyKey.INCORRECT_LOGIN)
     private String login;
     @NotBlank
-    @Pattern(regexp = "[A-ZА-Я][а-яa-z]{1,19}", message = ExceptionPropertyKey.INCORRECT_USER_NAME)
+    @Pattern(regexp = "[A-ZА-Я][а-яa-z]{1,19}", message = ExceptionPropertyKey.INCORRECT_FIRST_NAME)
     private String firstName;
     @NotBlank
-    @Pattern(regexp = "[A-ZА-Я][а-яa-z]{1,19}", message = ExceptionPropertyKey.INCORRECT_USER_NAME)
+    @Pattern(regexp = "[A-ZА-Я][а-яa-z]{1,19}", message = ExceptionPropertyKey.INCORRECT_LAST_NAME)
     private String lastName;
 }

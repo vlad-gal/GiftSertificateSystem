@@ -20,12 +20,12 @@ public class RequestGiftCertificateDto {
     @Pattern(regexp = "[а-яА-Я\\w\\s\\d\\.,?!]{1,250}",
             message = ExceptionPropertyKey.INCORRECT_GIFT_CERTIFICATE_DESCRIPTION)
     private String description;
-    @DecimalMin(value = "0.01", message = ExceptionPropertyKey.MIN_PRICE)
-    @DecimalMax(value = "1000000", message = ExceptionPropertyKey.MAX_PRICE)
+    @DecimalMin(value = "0.01", message = ExceptionPropertyKey.INCORRECT_MIN_PRICE)
+    @DecimalMax(value = "1000000", message = ExceptionPropertyKey.INCORRECT_MAX_PRICE)
     @Digits(integer = 8, fraction = 2)
     private BigDecimal price;
-    @Min(value = 1, message = ExceptionPropertyKey.MIN_DURATION)
-    @Max(value = 30, message = ExceptionPropertyKey.MAX_DURATION)
+    @Min(value = 1, message = ExceptionPropertyKey.INCORRECT_MIN_DURATION)
+    @Max(value = 30, message = ExceptionPropertyKey.INCORRECT_MAX_DURATION)
     private int duration;
     @Valid
     private Set<TagDto> tags;

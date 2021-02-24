@@ -27,5 +27,4 @@ public class QPredicate {
     public static QPredicate builder() {
         return new QPredicate();
     }
-
 }

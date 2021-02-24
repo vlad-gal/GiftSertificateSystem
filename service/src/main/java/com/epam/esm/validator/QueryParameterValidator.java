@@ -58,7 +58,7 @@ public class QueryParameterValidator {
 
     private void isValidName(String name) {
         if (name != null && !name.isEmpty() && !name.matches(REGEX_USER_NAME_VALUE)) {
-            throw new ValidationException(ExceptionPropertyKey.INCORRECT_USER_NAME, name);
+            throw new ValidationException(ExceptionPropertyKey.INCORRECT_LAST_NAME, name);
         }
     }
 

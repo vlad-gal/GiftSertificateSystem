@@ -49,7 +49,7 @@ public class UserServiceImpl implements UserService {
             throw new InvalidCredentialsException(ExceptionPropertyKey.INCORRECT_CREDENTIALS);
         }
         if (userRepository.existsByLogin(userDto.getLogin())) {
-            throw new UserAlreadyExistException(ExceptionPropertyKey.USER_ALREADY_EXIST);
+            throw new UserAlreadyExistException(ExceptionPropertyKey.USER_WITH_LOGIN_ALREADY_EXIST,userDto.getLogin());
         }
         User user = modelMapper.map(userDto, User.class);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
@@ -92,12 +92,6 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.USER_ORDER_NOT_FOUND, userId, orderId));
         return modelMapper.map(order, OrderDto.class);
     }
-
-//    @Override
-//    public UserDto findUserByLogin(String login) {
-//        User user = userRepository.findByLogin(login).orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.USER_WITH_LOGIN_NOT_FOUND, login));
-//        return modelMapper.map(user, UserDto.class);
-//    }
 
     private User checkAndGetUser(long id) {
         Optional<User> userOptional = userRepository.findById(id);
