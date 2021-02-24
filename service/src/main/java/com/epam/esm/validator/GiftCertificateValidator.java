@@ -1,6 +1,7 @@
 package com.epam.esm.validator;
 
 import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.dto.GiftCertificateField;
 import com.epam.esm.exception.ExceptionPropertyKey;
 import com.epam.esm.exception.ValidationException;
 import lombok.experimental.UtilityClass;
@@ -8,9 +9,8 @@ import lombok.experimental.UtilityClass;
 import java.math.BigDecimal;
 
 @UtilityClass
-public class GiftCertificateValidator {
-    private final String REGEX_NAME_AND_DESCRIPTION = "[‡-ˇ¿-ﬂ\\w\\s\\d\\.,?!]{1,250}";
-    private final long MIN_ID = 1;
+public class GiftCertificateValidator extends BaseValidator {
+    private final String REGEX_NAME_AND_DESCRIPTION = "[–∞-—è–ê-–Ø\\w\\s\\d\\.,?!]{1,250}";
     private final BigDecimal MIN_PRICE = new BigDecimal("0.01");
     private final BigDecimal MAX_PRICE = new BigDecimal("1000000");
     private final int MIN_DURATION = 1;
@@ -23,12 +23,6 @@ public class GiftCertificateValidator {
         isValidDuration(giftCertificateDto.getDuration());
     }
 
-    public void isValidId(long id) {
-        if (id < MIN_ID) {
-            throw new ValidationException(ExceptionPropertyKey.INCORRECT_ID, id);
-        }
-    }
-
     private void isValidName(String name) {
         if (name == null || name.isEmpty() || !name.matches(REGEX_NAME_AND_DESCRIPTION)) {
             throw new ValidationException(ExceptionPropertyKey.INCORRECT_GIFT_CERTIFICATE_NAME, name);
@@ -36,7 +30,7 @@ public class GiftCertificateValidator {
     }
 
     private void isValidDescription(String description) {
-        if (description != null && !description.isEmpty() && !description.matches(REGEX_NAME_AND_DESCRIPTION)) {
+        if (description == null || description.isEmpty() || !description.matches(REGEX_NAME_AND_DESCRIPTION)) {
             throw new ValidationException(ExceptionPropertyKey.INCORRECT_GIFT_CERTIFICATE_DESCRIPTION, description);
         }
     }
@@ -50,6 +44,30 @@ public class GiftCertificateValidator {
     private void isValidDuration(int duration) {
         if (duration < MIN_DURATION || duration > MAX_DURATION) {
             throw new ValidationException(ExceptionPropertyKey.INCORRECT_DURATION, duration);
+        }
+    }
+
+    public void isValidField(GiftCertificateField giftCertificateField) {
+        try {
+            GiftCertificateField.FieldName fieldName = GiftCertificateField.FieldName.valueOf(giftCertificateField.getFieldName().toUpperCase());
+            switch (fieldName) {
+                case NAME:
+                    isValidName(giftCertificateField.getFieldValue());
+                    break;
+                case DESCRIPTION:
+                    isValidDescription(giftCertificateField.getFieldValue());
+                    break;
+                case PRICE:
+                    isValidPrice(new BigDecimal(giftCertificateField.getFieldValue()));
+                    break;
+                case DURATION:
+                    isValidDuration(Integer.parseInt(giftCertificateField.getFieldValue()));
+                    break;
+            }
+        } catch (NumberFormatException exception) {
+            throw new ValidationException(ExceptionPropertyKey.INCORRECT_FIELD_VALUE, giftCertificateField.getFieldValue(), giftCertificateField.getFieldName());
+        } catch (IllegalArgumentException exception) {
+            throw new ValidationException(ExceptionPropertyKey.INCORRECT_FIELD_NAME, giftCertificateField.getFieldName());
         }
     }
 }

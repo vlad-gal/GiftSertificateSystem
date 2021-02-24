@@ -1,174 +1,219 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dao.GiftCertificateDao;
+import com.epam.esm.dao.OrderDao;
 import com.epam.esm.dao.TagDao;
 import com.epam.esm.dto.GiftCertificateDto;
-import com.epam.esm.util.QueryParameter;
+import com.epam.esm.dto.GiftCertificateField;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Tag;
+import com.epam.esm.exception.DeleteResourceException;
 import com.epam.esm.exception.ExceptionPropertyKey;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.service.GiftCertificateService;
-import com.epam.esm.util.QueryParameterManager;
+import com.epam.esm.util.ParameterManager;
 import com.epam.esm.validator.GiftCertificateValidator;
 import com.epam.esm.validator.QueryParameterValidator;
 import com.epam.esm.validator.TagValidator;
-import lombok.extern.log4j.Log4j2;
-import org.apache.logging.log4j.Level;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.math.BigDecimal;
+import java.util.*;
 import java.util.stream.Collectors;
 
-@Log4j2
+@Slf4j
 @Service
 public class GiftCertificateServiceImpl implements GiftCertificateService {
     private final GiftCertificateDao giftCertificateDao;
     private final TagDao tagDao;
+    private final OrderDao orderDao;
     private final ModelMapper modelMapper;
 
     @Autowired
-    public GiftCertificateServiceImpl(GiftCertificateDao giftCertificateDao, ModelMapper modelMapper, TagDao tagDao) {
+    public GiftCertificateServiceImpl(GiftCertificateDao giftCertificateDao, TagDao tagDao, OrderDao orderDao,
+                                      ModelMapper modelMapper) {
         this.giftCertificateDao = giftCertificateDao;
         this.modelMapper = modelMapper;
         this.tagDao = tagDao;
+        this.orderDao = orderDao;
     }
 
     @Override
     @Transactional
     public GiftCertificateDto addGiftCertificate(GiftCertificateDto giftCertificateDto) {
-        giftCertificateDto.setCreatedDate(LocalDateTime.now());
-        giftCertificateDto.setLastUpdateDate(LocalDateTime.now());
         GiftCertificateValidator.isValidGiftCertificate(giftCertificateDto);
+        Set<Tag> existTag = new HashSet<>();
+        Set<Tag> newTag = new HashSet<>();
         if (giftCertificateDto.getTags() != null) {
             giftCertificateDto.getTags().forEach(TagValidator::isValidTag);
+            giftCertificateDto.getTags().stream().map(tagDto -> modelMapper.map(tagDto, Tag.class))
+                    .forEach(tag -> {
+                        if (checkIfTagAlreadyExist(tag)) {
+                            log.debug("Tag already exist: {}", tag);
+                            long tagId = tagDao.findTagByName(tag.getName())
+                                    .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.TAG_WITH_NAME_NOT_FOUND,
+                                            tag.getName())).getTagId();
+                            tag.setTagId(tagId);
+                            existTag.add(tag);
+                        } else {
+                            log.debug("New tag: {}", tag);
+                            newTag.add(tag);
+                        }
+                    });
         }
         GiftCertificate giftCertificate = modelMapper.map(giftCertificateDto, GiftCertificate.class);
+        giftCertificate.setTags(newTag);
         long certificateId = giftCertificateDao.add(giftCertificate);
         giftCertificate.setId(certificateId);
-        if (giftCertificate.getTags() != null) {
-            giftCertificate.getTags().forEach(tag -> checkAndAddRelationBetweenTagAndGiftCertificate(giftCertificate.getId(), tag));
+        if (!existTag.isEmpty()) {
+            giftCertificate.addAll(existTag);
+            giftCertificateDao.update(giftCertificate);
         }
-        log.log(Level.INFO, "Gift certificate added: {}", giftCertificate);
+        log.info("Gift certificate added: {}", giftCertificate);
         return modelMapper.map(giftCertificate, GiftCertificateDto.class);
     }
 
     @Override
     @Transactional
-    public GiftCertificateDto addTagToGiftCertificate(long giftCertificateId, TagDto tagDto) {
+    public Set<TagDto> addTagToGiftCertificate(long giftCertificateId, TagDto tagDto) {
         GiftCertificateValidator.isValidId(giftCertificateId);
         TagValidator.isValidTag(tagDto);
         GiftCertificate giftCertificate = checkAndGetGiftCertificate(giftCertificateId);
-        giftCertificate.setLastUpdateDate(LocalDateTime.now());
         Tag tag = modelMapper.map(tagDto, Tag.class);
-        checkAndAddRelationBetweenTagAndGiftCertificate(giftCertificateId, tag);
+        if (checkIfTagAlreadyExist(tag)) {
+            log.debug("Tag already exist: {}", tag);
+            long tagId = tagDao.findTagByName(tag.getName())
+                    .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.TAG_WITH_NAME_NOT_FOUND,
+                            tag.getName())).getTagId();
+            tag.setTagId(tagId);
+        }
+        giftCertificate.add(tag);
         GiftCertificate updatedGiftCertificate = giftCertificateDao.update(giftCertificate);
-        Set<Tag> giftCertificateTags = giftCertificateDao.findGiftCertificateTags(giftCertificateId);
-        updatedGiftCertificate.setTags(giftCertificateTags);
-        log.log(Level.INFO, "Tag added to gift certificate: {}", tag);
-        return modelMapper.map(updatedGiftCertificate, GiftCertificateDto.class);
+        log.info("Tag added to gift certificate: {}", tag);
+        return updatedGiftCertificate.getTags()
+                .stream().map(t -> modelMapper.map(t, TagDto.class)).collect(Collectors.toSet());
     }
 
     @Override
-    @Transactional
     public GiftCertificateDto findGiftCertificateById(long id) {
         GiftCertificateValidator.isValidId(id);
         GiftCertificate giftCertificate = checkAndGetGiftCertificate(id);
-        giftCertificate.setTags(giftCertificateDao.findGiftCertificateTags(id));
-        log.log(Level.INFO, "Found gift certificate by id: {}", giftCertificate);
+        log.info("Found gift certificate by id: {}", giftCertificate);
         return modelMapper.map(giftCertificate, GiftCertificateDto.class);
     }
 
     @Override
-    @Transactional
-    public List<GiftCertificateDto> findGiftCertificatesByParameters(QueryParameter queryParameter) {
-        QueryParameterValidator.isValidQueryParameters(queryParameter);
-        String query = QueryParameterManager.createQuery(queryParameter);
-        log.log(Level.DEBUG, "Query parameter: {}", queryParameter);
-        List<GiftCertificate> giftCertificates = giftCertificateDao.findCertificatesByQueryParameters(query);
-        for (GiftCertificate certificate : giftCertificates) {
-            Set<Tag> giftCertificateTags = giftCertificateDao.findGiftCertificateTags(certificate.getId());
-            certificate.setTags(giftCertificateTags);
-        }
+    public Set<TagDto> findGiftCertificateTags(long certificateId) {
+        GiftCertificateValidator.isValidId(certificateId);
+        GiftCertificate giftCertificate = checkAndGetGiftCertificate(certificateId);
+        Set<Tag> tags = giftCertificate.getTags();
+        return tags.stream().map(tag -> modelMapper.map(tag, TagDto.class)).collect(Collectors.toSet());
+    }
+
+    @Override
+    public List<GiftCertificateDto> findGiftCertificatesByParameters(Map<String, String> queryParameters) {
+        Map<String, String> processedQueryParameters = ParameterManager.giftCertificateQueryParametersProcessing(queryParameters);
+        QueryParameterValidator.isValidGiftCertificateQueryParameters(processedQueryParameters);
+        log.debug("Query parameter: {}", processedQueryParameters);
+        List<GiftCertificate> giftCertificates = giftCertificateDao.findAllByParameters(processedQueryParameters);
         return giftCertificates.stream()
                 .map(giftCertificate -> modelMapper.map(giftCertificate, GiftCertificateDto.class))
                 .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional
     public void deleteGiftCertificateById(long id) {
         GiftCertificateValidator.isValidId(id);
+        if (orderDao.checkIfCertificateUsed(id)) {
+            throw new DeleteResourceException(ExceptionPropertyKey.CANNOT_DELETE_GIFT_CERTIFICATE, id);
+        }
         giftCertificateDao.removeById(id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteTagFromGiftCertificate(long certificateId, long tagId) {
+        GiftCertificateValidator.isValidId(certificateId);
+        TagValidator.isValidId(tagId);
+        GiftCertificate giftCertificate = checkAndGetGiftCertificate(certificateId);
+        Tag tag = checkAndGetTag(tagId);
+        giftCertificate.getTags().remove(tag);
+        giftCertificateDao.update(giftCertificate);
     }
 
     @Override
     @Transactional
     public GiftCertificateDto updateGiftCertificate(long giftCertificateId, GiftCertificateDto giftCertificateDto) {
         GiftCertificateValidator.isValidId(giftCertificateId);
+        GiftCertificateValidator.isValidGiftCertificate(giftCertificateDto);
         GiftCertificate giftCertificate = checkAndGetGiftCertificate(giftCertificateId);
         updateFields(giftCertificateDto, giftCertificate);
-        giftCertificate.setLastUpdateDate(LocalDateTime.now());
-        GiftCertificate updatedGiftCertificate = giftCertificateDao.update(giftCertificate);
-        giftCertificate.getTags().forEach(tag -> checkAndAddRelationBetweenTagAndGiftCertificate(giftCertificateId, tag));
-        Set<Tag> changedTags = giftCertificateDao.findGiftCertificateTags(giftCertificateId);
-        updatedGiftCertificate.setTags(changedTags);
-        log.log(Level.INFO, "Gift certificate with id = {} updated", giftCertificateId);
-        return modelMapper.map(updatedGiftCertificate, GiftCertificateDto.class);
+        giftCertificateDao.update(giftCertificate);
+        log.info("Gift certificate with id = {} updated", giftCertificateId);
+        return modelMapper.map(giftCertificate, GiftCertificateDto.class);
     }
 
-    private void checkAndAddRelationBetweenTagAndGiftCertificate(long giftCertificateId, Tag tag) {
-        Tag processedTag;
-        if (checkIfTagAlreadyExist(tag)) {
-            log.log(Level.DEBUG, "Tag already exist: {}", tag);
-            processedTag = tagDao.findTagByName(tag.getName())
-                    .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.TAG_WITH_NAME_NOT_FOUND,
-                            tag.getName()));
-        } else {
-            log.log(Level.DEBUG, "New tag: {}", tag);
-            long tagId = tagDao.add(tag);
-            processedTag = tag;
-            processedTag.setTagId(tagId);
-        }
-        tag.setTagId(processedTag.getTagId());
-        giftCertificateDao.addRelationBetweenTagAndGiftCertificate(processedTag.getTagId(), giftCertificateId);
+    @Override
+    @Transactional
+    public GiftCertificateDto updateGiftCertificateField(long giftCertificateId, GiftCertificateField giftCertificateField) {
+        GiftCertificateValidator.isValidId(giftCertificateId);
+        GiftCertificateValidator.isValidField(giftCertificateField);
+        GiftCertificate giftCertificate = checkAndGetGiftCertificate(giftCertificateId);
+        updateField(giftCertificateField, giftCertificate);
+        giftCertificateDao.update(giftCertificate);
+        log.info("Gift certificate with id = {} updated", giftCertificateId);
+        return modelMapper.map(checkAndGetGiftCertificate(giftCertificateId), GiftCertificateDto.class);
     }
 
     private void updateFields(GiftCertificateDto receivedGiftCertificate, GiftCertificate updatedGiftCertificate) {
-        if (receivedGiftCertificate.getName() != null && !receivedGiftCertificate.getName().isEmpty()) {
-            updatedGiftCertificate.setName(receivedGiftCertificate.getName());
-        }
-        if (receivedGiftCertificate.getDescription() != null && !receivedGiftCertificate.getDescription().isEmpty()) {
-            updatedGiftCertificate.setDescription(receivedGiftCertificate.getDescription());
-        }
-        if (receivedGiftCertificate.getPrice() != null) {
-            updatedGiftCertificate.setPrice(receivedGiftCertificate.getPrice());
-        }
-        if (receivedGiftCertificate.getDuration() > 0) {
-            updatedGiftCertificate.setDuration(receivedGiftCertificate.getDuration());
-        }
-        GiftCertificateValidator.isValidGiftCertificate(modelMapper.map(updatedGiftCertificate, GiftCertificateDto.class));
+        updatedGiftCertificate.setName(receivedGiftCertificate.getName());
+        updatedGiftCertificate.setDescription(receivedGiftCertificate.getDescription());
+        updatedGiftCertificate.setPrice(receivedGiftCertificate.getPrice());
+        updatedGiftCertificate.setDuration(receivedGiftCertificate.getDuration());
         if (receivedGiftCertificate.getTags() != null) {
             receivedGiftCertificate.getTags().forEach(TagValidator::isValidTag);
         }
-        Set<Tag> giftCertificateTags = giftCertificateDao.findGiftCertificateTags(updatedGiftCertificate.getId());
-        Set<Tag> addedTags = new HashSet<>();
+        Set<Tag> giftCertificateTags = updatedGiftCertificate.getTags();
         if (receivedGiftCertificate.getTags() != null) {
             receivedGiftCertificate.getTags().stream().map(tagDto -> modelMapper.map(tagDto, Tag.class)).forEach(tag -> {
                 if (!giftCertificateTags.contains(tag)) {
-                    addedTags.add(tag);
+                    if (checkIfTagAlreadyExist(tag)) {
+                        log.debug("Tag already exist: {}", tag);
+                        long tagId = tagDao.findTagByName(tag.getName())
+                                .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.TAG_WITH_NAME_NOT_FOUND,
+                                        tag.getName())).getTagId();
+                        tag.setTagId(tagId);
+                    }
+                    giftCertificateTags.add(tag);
                 }
             });
         }
-        updatedGiftCertificate.setTags(addedTags);
-        log.log(Level.DEBUG, "Updated gift certificate: {}", updatedGiftCertificate);
+        updatedGiftCertificate.setTags(giftCertificateTags);
+        log.debug("Updated gift certificate: {}", updatedGiftCertificate);
+    }
+
+    private void updateField(GiftCertificateField giftCertificateField, GiftCertificate updatedGiftCertificate) {
+        GiftCertificateField.FieldName fieldName = GiftCertificateField.FieldName.valueOf(giftCertificateField.getFieldName().toUpperCase());
+        switch (fieldName) {
+            case NAME:
+                updatedGiftCertificate.setName(giftCertificateField.getFieldValue());
+                break;
+            case DESCRIPTION:
+                updatedGiftCertificate.setDescription(giftCertificateField.getFieldValue());
+                break;
+            case PRICE:
+                updatedGiftCertificate.setPrice(new BigDecimal(giftCertificateField.getFieldValue()));
+                break;
+            case DURATION:
+                updatedGiftCertificate.setDuration(Integer.parseInt(giftCertificateField.getFieldValue()));
+                break;
+        }
     }
 
     private boolean checkIfTagAlreadyExist(Tag tag) {
@@ -179,5 +224,11 @@ public class GiftCertificateServiceImpl implements GiftCertificateService {
         Optional<GiftCertificate> giftCertificateOptional = giftCertificateDao.findById(id);
         return giftCertificateOptional
                 .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.GIFT_CERTIFICATE_WITH_ID_NOT_FOUND, id));
+    }
+
+    private Tag checkAndGetTag(long id) {
+        Optional<Tag> tagOptionalOptional = tagDao.findById(id);
+        return tagOptionalOptional
+                .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.TAG_WITH_ID_NOT_FOUND, id));
     }
 }

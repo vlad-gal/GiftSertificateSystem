@@ -1,37 +1,34 @@
 package com.epam.esm.dao.impl;
 
+import com.epam.esm.config.PersistenceConfig;
 import com.epam.esm.dao.TagDao;
-import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.entity.Tag;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.NoResultException;
+import javax.persistence.PersistenceException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@SpringBootTest(classes = {PersistenceConfig.class})
+@ActiveProfiles("test")
+@Transactional
 class TagDaoImplTest {
-    private EmbeddedDatabase dataSource;
+    @Autowired
     private TagDao tagDao;
+    private HashMap<String, String> defaultQueryParameters;
 
-    @BeforeEach
-    void setUp() {
-        dataSource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-                .addScript("classpath:schema.sql").addScript("classpath:test-data.sql").build();
-        tagDao = new TagDaoImpl(new JdbcTemplate(dataSource), new TagMapper());
-    }
-
-    @AfterEach
-    void tearDown() {
-        dataSource.shutdown();
-        tagDao = null;
+    {
+        defaultQueryParameters = new HashMap<>();
+        defaultQueryParameters.put("page", "1");
+        defaultQueryParameters.put("per_page", "5");
     }
 
     @Test
@@ -55,7 +52,18 @@ class TagDaoImplTest {
     }
 
     @Test
-    void whenAddCorrectTagThenShouldReturnCorrectTag() {
+    void whenFindAllByParametersThenShouldReturnListTags() {
+        List<Tag> tagList = tagDao.findAllByParameters(defaultQueryParameters);
+        assertEquals(5, tagList.size());
+    }
+
+    @Test
+    void whenFindAllByParametersThenShouldThrowException() {
+        assertThrows(NullPointerException.class, () -> tagDao.findAllByParameters(null));
+    }
+
+    @Test
+    void whenAddCorrectTagThenShouldReturnTagId() {
         Tag tag = new Tag();
         tag.setName("Drive");
         long actual = tagDao.add(tag);
@@ -66,30 +74,31 @@ class TagDaoImplTest {
     void whenAddIncorrectTagThenShouldThrowException() {
         Tag tag = new Tag();
         tag.setName(null);
-        assertThrows(DataIntegrityViolationException.class, () -> tagDao.add(tag));
+        assertThrows(PersistenceException.class, () -> tagDao.add(tag));
     }
 
     @Test
-    void whenRemoveByIdThenShouldListTagsLessOne() {
-        List<Tag> tagList = tagDao.findAll();
-        int expected = tagList.size();
+    void whenRemoveByIdThenShouldNotFound() {
         tagDao.removeById(1);
-        List<Tag> tagListAfterRemove = tagDao.findAll();
-        int actual = tagListAfterRemove.size();
-        assertNotEquals(expected, actual);
+        Optional<Tag> optionalTag = tagDao.findById(1);
+        boolean condition = optionalTag.isPresent();
+        assertFalse(condition);
     }
 
     @Test
     void whenFindTagByExistNameThenShouldReturnTrue() {
-        Optional<Tag> optionalTag = tagDao.findTagByName("Поход");
+        Optional<Tag> optionalTag = tagDao.findTagByName("Здоровье");
         boolean condition = optionalTag.isPresent();
         assertTrue(condition);
     }
 
     @Test
-    void whenFindTagByNotExistNameThenShouldReturnFalse() {
-        Optional<Tag> optionalTag = tagDao.findTagByName("Race");
-        boolean condition = optionalTag.isPresent();
-        assertFalse(condition);
+    void whenFindTagByNotExistNameThenShouldThrowException() {
+        assertThrows(NoResultException.class, () -> tagDao.findTagByName("Race"));
+    }
+
+    @Test
+    void whenUpdateTagThenShouldThrowException() {
+        assertThrows(UnsupportedOperationException.class, () -> tagDao.update(null));
     }
 }

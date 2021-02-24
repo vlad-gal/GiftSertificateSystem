@@ -12,9 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration;
 import org.modelmapper.convention.MatchingStrategies;
 
-import java.util.Collections;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -57,14 +55,24 @@ class TagServiceImplTest {
     }
 
     @Test
-    void whenFindAllTagsThenShouldReturnSetTags() {
+    void whenAllTagsByParametersThenShouldReturnListTags() {
+        Map<String, String> queryParameters = new HashMap<>();
+        queryParameters.put("tagName", "Hi");
+
         Tag tag = new Tag();
         tag.setTagId(1);
         tag.setName("Hi");
 
-        when(tagDao.findAll()).thenReturn(Collections.singletonList(tag));
-        Set<TagDto> allTags = tagService.findAllTags();
+        when(tagDao.findAllByParameters(queryParameters)).thenReturn(Collections.singletonList(tag));
+        List<TagDto> allTags = tagService.findAllTagsByParameters(queryParameters);
         assertEquals(1, allTags.size());
+    }
+
+    @Test
+    void whenAllTagsByParametersThenShouldThrowException() {
+        Map<String, String> queryParameters = new HashMap<>();
+        queryParameters.put("tagName", "H@@i");
+        assertThrows(ValidationException.class, () -> tagService.findAllTagsByParameters(queryParameters));
     }
 
     @Test

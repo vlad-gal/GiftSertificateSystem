@@ -1,56 +1,43 @@
 package com.epam.esm.dao.impl;
 
+import com.epam.esm.config.PersistenceConfig;
 import com.epam.esm.dao.GiftCertificateDao;
-import com.epam.esm.dao.mapper.GiftCertificateMapper;
-import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Tag;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DuplicateKeyException;
-import org.springframework.jdbc.BadSqlGrammarException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabase;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
-import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.PersistenceException;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-
+@SpringBootTest(classes = {PersistenceConfig.class})
+@ActiveProfiles("test")
+@Transactional
 class GiftCertificateDaoImplTest {
-    private EmbeddedDatabase dataSource;
+    @Autowired
     private GiftCertificateDao giftCertificateDao;
+    private HashMap<String, String> defaultQueryParameters;
 
-    @BeforeEach
-    void setUp() {
-        dataSource = new EmbeddedDatabaseBuilder().setType(EmbeddedDatabaseType.H2)
-                .addScript("classpath:schema.sql").addScript("classpath:test-data.sql").build();
-        giftCertificateDao = new GiftCertificateDaoImpl(new JdbcTemplate(dataSource), new GiftCertificateMapper(),
-                new TagMapper());
-    }
-
-    @AfterEach
-    void tearDown() {
-        dataSource.shutdown();
-        giftCertificateDao = null;
+    {
+        defaultQueryParameters = new HashMap<>();
+        defaultQueryParameters.put("page", "1");
+        defaultQueryParameters.put("per_page", "2");
     }
 
     @Test
-    void whenAddCorrectGiftCertificateThenShouldReturnCorrectGiftCertificate() {
+    void whenAddCorrectGiftCertificateThenShouldReturnGiftCertificateId() {
         GiftCertificate giftCertificate = new GiftCertificate();
         giftCertificate.setName("Hello");
         giftCertificate.setDescription("Hello from description");
         giftCertificate.setPrice(new BigDecimal("123.0"));
-        giftCertificate.setCreatedDate(LocalDateTime.now());
-        giftCertificate.setLastUpdateDate(LocalDateTime.now());
         long actual = giftCertificateDao.add(giftCertificate);
         assertEquals(6, actual);
     }
@@ -61,9 +48,7 @@ class GiftCertificateDaoImplTest {
         giftCertificate.setName(null);
         giftCertificate.setDescription("Hello from description");
         giftCertificate.setPrice(new BigDecimal("123.0"));
-        giftCertificate.setCreatedDate(LocalDateTime.now());
-        giftCertificate.setLastUpdateDate(LocalDateTime.now());
-        assertThrows(DataIntegrityViolationException.class, () -> giftCertificateDao.add(giftCertificate));
+        assertThrows(PersistenceException.class, () -> giftCertificateDao.add(giftCertificate));
     }
 
     @Test
@@ -75,19 +60,17 @@ class GiftCertificateDaoImplTest {
 
     @Test
     void whenFindByNotExistIdThenShouldReturnFalse() {
-        Optional<GiftCertificate> giftCertificateOptional = giftCertificateDao.findById(1000);
+        Optional<GiftCertificate> giftCertificateOptional = giftCertificateDao.findById(100100);
         boolean condition = giftCertificateOptional.isPresent();
         assertFalse(condition);
     }
 
     @Test
-    void whenRemoveByExistIdThenShouldListCertificatesLessOne() {
-        List<GiftCertificate> certificateList = giftCertificateDao.findCertificatesByQueryParameters("");
-        int expected = certificateList.size();
+    void whenRemoveByExistIdThenShouldNotFound() {
         giftCertificateDao.removeById(1);
-        List<GiftCertificate> certificateListAfterRemove = giftCertificateDao.findCertificatesByQueryParameters("");
-        int actual = certificateListAfterRemove.size();
-        assertNotEquals(expected, actual);
+        Optional<GiftCertificate> giftCertificateOptional = giftCertificateDao.findById(1);
+        boolean condition = giftCertificateOptional.isPresent();
+        assertFalse(condition);
     }
 
     @Test
@@ -95,10 +78,11 @@ class GiftCertificateDaoImplTest {
         GiftCertificate giftCertificate = new GiftCertificate();
         giftCertificate.setId(1);
         giftCertificate.setName("SPA");
+        giftCertificate.setDescription("SPA for you");
         giftCertificate.setPrice(new BigDecimal("123.0"));
         giftCertificate.setCreatedDate(LocalDateTime.now());
-        giftCertificate.setLastUpdateDate(LocalDateTime.now());
         GiftCertificate updatedGiftCertificate = giftCertificateDao.update(giftCertificate);
+        giftCertificate.setLastUpdateDate(updatedGiftCertificate.getLastUpdateDate());
         assertEquals(giftCertificate, updatedGiftCertificate);
     }
 
@@ -108,35 +92,17 @@ class GiftCertificateDaoImplTest {
         giftCertificate.setId(1);
         giftCertificate.setName(null);
         giftCertificate.setPrice(new BigDecimal("123.0"));
-        giftCertificate.setCreatedDate(LocalDateTime.now());
-        giftCertificate.setLastUpdateDate(LocalDateTime.now());
-        assertThrows(DataIntegrityViolationException.class, () -> giftCertificateDao.update(giftCertificate));
+        assertThrows(PersistenceException.class, () -> giftCertificateDao.update(giftCertificate));
     }
 
     @Test
     void whenFindCertificatesByQueryParametersThenShouldReturnListCertificates() {
-        List<GiftCertificate> allCertificates = giftCertificateDao.findCertificatesByQueryParameters("");
-        assertEquals(5, allCertificates.size());
+        List<GiftCertificate> allCertificates = giftCertificateDao.findAllByParameters(defaultQueryParameters);
+        assertEquals(2, allCertificates.size());
     }
 
     @Test
     void whenFindCertificatesByQueryParametersThenShouldThrowException() {
-        assertThrows(BadSqlGrammarException.class, () -> giftCertificateDao.findCertificatesByQueryParameters("SDASD"));
-    }
-
-    @Test
-    void whenFindGiftCertificateTagsThenShouldReturnSetTags() {
-        Set<Tag> tagSet = giftCertificateDao.findGiftCertificateTags(1);
-        assertEquals(3, tagSet.size());
-    }
-
-    @Test
-    void whenAddRelationBetweenTagAndGiftCertificateThenShouldNotThrowException() {
-        assertDoesNotThrow(() -> giftCertificateDao.addRelationBetweenTagAndGiftCertificate(2, 2));
-    }
-
-    @Test
-    void whenAddRelationBetweenTagAndGiftCertificateThenShouldThrowException() {
-        assertThrows(DuplicateKeyException.class, () -> giftCertificateDao.addRelationBetweenTagAndGiftCertificate(1, 2));
+        assertThrows(NullPointerException.class, () -> giftCertificateDao.findAllByParameters(null));
     }
 }

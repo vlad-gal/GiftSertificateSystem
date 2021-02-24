@@ -15,7 +15,6 @@ INSERT INTO gift_certificates (certificateId, name, description, price, duration
 VALUES (5, 'Туристическое оборудование', 'Купи 10 ледорубов и получи 11 в подарок!', 400, 1, '2021-01-03 00:20:41',
         '2021-01-03 00:20:41');
 
-
 INSERT INTO tags (tagId, tagName)
 VALUES (1, 'Отдых');
 INSERT INTO tags (tagId, tagName)
@@ -65,3 +64,44 @@ INSERT INTO certificates_has_tags (certificateId, tagId)
 VALUES (5, 5);
 INSERT INTO certificates_has_tags (certificateId, tagId)
 VALUES (5, 7);
+
+INSERT INTO users (userId, login, firstName, lastName)
+VALUES (1, 'genry', 'Гриша', 'Пупкин');
+INSERT INTO users (userId, login, firstName, lastName)
+VALUES (2, 'josh', 'Josh', 'Bin');
+INSERT INTO users (userId, login, firstName, lastName)
+VALUES (3, 'qwe', 'Vlad', 'Gal');
+INSERT INTO users (userId, login, firstName, lastName)
+VALUES (4, 'john', 'Витя', 'АК');
+INSERT INTO users (userId, login, firstName, lastName)
+VALUES (5, 'dou', 'Dick', 'Brant');
+
+INSERT INTO orders (orderId, userId, purchase_date, cost)
+VALUES (1, 1, '2021-01-03 00:20:41', 123);
+INSERT INTO orders (orderId, userId, purchase_date, cost)
+VALUES (2, 1, '2021-01-03 00:20:41', 332);
+INSERT INTO orders (orderId, userId, purchase_date, cost)
+VALUES (3, 1, '2021-01-03 00:20:41', 1);
+INSERT INTO orders (orderId, userId, purchase_date, cost)
+VALUES (4, 2, '2021-01-03 00:20:41', 6545);
+INSERT INTO orders (orderId, userId, purchase_date, cost)
+VALUES (5, 3, '2021-01-03 00:20:41', 5);
+INSERT INTO orders (orderId, userId, purchase_date, cost)
+VALUES (6, 4, '2021-01-03 00:20:41', 344);
+
+INSERT INTO orders_has_gift_certificate (orderId, certificateId)
+VALUES (1, 2);
+INSERT INTO orders_has_gift_certificate (orderId, certificateId)
+VALUES (1, 1);
+INSERT INTO orders_has_gift_certificate (orderId, certificateId)
+VALUES (2, 3);
+INSERT INTO orders_has_gift_certificate (orderId, certificateId)
+VALUES (3, 5);
+INSERT INTO orders_has_gift_certificate (orderId, certificateId)
+VALUES (4, 1);
+INSERT INTO orders_has_gift_certificate (orderId, certificateId)
+VALUES (1, 3);
+INSERT INTO orders_has_gift_certificate (orderId, certificateId)
+VALUES (1, 4);
+INSERT INTO orders_has_gift_certificate (orderId, certificateId)
+VALUES (1, 5);

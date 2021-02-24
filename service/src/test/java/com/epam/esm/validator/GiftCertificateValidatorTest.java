@@ -1,6 +1,7 @@
 package com.epam.esm.validator;
 
 import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.dto.GiftCertificateField;
 import com.epam.esm.exception.ValidationException;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -11,7 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class GiftCertificateValidatorTest {
-
 
     public static Object[][] correctGiftCertificate() {
         GiftCertificateDto giftCertificate1 = new GiftCertificateDto();
@@ -73,23 +73,54 @@ class GiftCertificateValidatorTest {
         assertThrows(ValidationException.class, () -> GiftCertificateValidator.isValidGiftCertificate(giftCertificateDto));
     }
 
-    public static Object[][] correctId() {
-        return new Object[][]{{1}, {25}, {103}};
+    public static Object[][] correctFieldsForUpdateGiftCertificateField() {
+        GiftCertificateField price = new GiftCertificateField();
+        price.setFieldName("price");
+        price.setFieldValue("1233");
+        GiftCertificateField name = new GiftCertificateField();
+        name.setFieldName("name");
+        name.setFieldValue("Upd name");
+        GiftCertificateField description = new GiftCertificateField();
+        description.setFieldName("description");
+        description.setFieldValue("Upd desc");
+        GiftCertificateField duration = new GiftCertificateField();
+        duration.setFieldName("duration");
+        duration.setFieldValue("1");
+        return new Object[][]{
+                {price}, {name}, {description}, {duration}
+        };
     }
 
     @ParameterizedTest
-    @MethodSource("correctId")
-    void whenIsValidIdThenShouldNotThrowException(long id) {
-        assertDoesNotThrow(() -> GiftCertificateValidator.isValidId(id));
+    @MethodSource("correctFieldsForUpdateGiftCertificateField")
+    void whenIsValidFieldThenShouldNotThrowException(GiftCertificateField giftCertificateField) {
+        assertDoesNotThrow(() -> GiftCertificateValidator.isValidField(giftCertificateField));
     }
 
-    public static Object[][] incorrectId() {
-        return new Object[][]{{0}, {-25}, {Long.MIN_VALUE}};
+    public static Object[][] incorrectFieldsForUpdateGiftCertificateField() {
+        GiftCertificateField price = new GiftCertificateField();
+        price.setFieldName("price");
+        price.setFieldValue("1233d");
+        GiftCertificateField name = new GiftCertificateField();
+        name.setFieldName("name");
+        name.setFieldValue("Upd#@ name");
+        GiftCertificateField description = new GiftCertificateField();
+        description.setFieldName("description");
+        description.setFieldValue("Upd desc1231!@!");
+        GiftCertificateField duration = new GiftCertificateField();
+        duration.setFieldName("duration");
+        duration.setFieldValue("1ewr");
+        GiftCertificateField incorrectField = new GiftCertificateField();
+        incorrectField.setFieldName("incorrect");
+        incorrectField.setFieldValue("2313");
+        return new Object[][]{
+                {price}, {name}, {description}, {duration}, {incorrectField}
+        };
     }
 
     @ParameterizedTest
-    @MethodSource("incorrectId")
-    void whenIsNotValidIdThenShouldThrowException(long id) {
-        assertThrows(ValidationException.class, () -> GiftCertificateValidator.isValidId(id));
+    @MethodSource("incorrectFieldsForUpdateGiftCertificateField")
+    void whenIsNotValidFieldThenShouldThrowException(GiftCertificateField giftCertificateField) {
+        assertThrows(ValidationException.class, () -> GiftCertificateValidator.isValidField(giftCertificateField));
     }
 }

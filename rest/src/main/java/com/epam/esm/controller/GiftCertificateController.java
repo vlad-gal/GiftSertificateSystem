@@ -1,16 +1,24 @@
 package com.epam.esm.controller;
 
+import com.epam.esm.controller.assembler.GiftCertificateAssembler;
+import com.epam.esm.controller.assembler.TagAssembler;
 import com.epam.esm.dto.GiftCertificateDto;
+import com.epam.esm.dto.GiftCertificateField;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.GiftCertificateService;
-import com.epam.esm.util.QueryParameter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * The {@code GiftCertificateController} class is an endpoint of the API
@@ -18,29 +26,42 @@ import java.util.Set;
  * <p>
  * {@code GiftCertificateController} is accessed by sending request to /certificates
  * and the response produced by {@code GiftCertificateController} carries application/json
- * type of content(except for {@link #deleteGiftCertificateById} method, which send no content back to the user).
+ * type of content (except for {@link #deleteGiftCertificateById} and {@link #deleteTagFromGiftCertificate} method,
+ * which send no content back to the user).
  * <p>
- * {@code GiftCertificateController} provides the user with methods to add gift certificate({@link #addGiftCertificate}),
- * add tag to gift certificate({@link #addTagToGiftCertificate}), find gift certificate by id({@link #findGiftCertificateById}),
- * find gift certificate tags({@link #findGiftCertificateTags}), update ({@link #updateGiftCertificate})
- * and delete by id({@link #deleteGiftCertificateById}) gift certificates from storage.
+ * {@code GiftCertificateController} provides the user with methods to add gift certificate ({@link #addGiftCertificate}),
+ * add tag to gift certificate ({@link #addTagToGiftCertificate}), find gift certificate by id ({@link #findGiftCertificateById}),
+ * find gift certificate tags ({@link #findGiftCertificateTags}), find gift certificates by parameters
+ * ({@link #findGiftCertificatesByParameters}), update gift certificate ({@link #updateGiftCertificate}),
+ * update one field in gift certificate ({@link #updateGiftCertificateField})
+ * delete gift certificate by id ({@link #deleteGiftCertificateById}),
+ * and delete tag from the gift certificate ({@link #deleteTagFromGiftCertificate}).
  *
  * @author Uladzislau Halatsevich
- * @version 1.0
+ * @version 2.0
  */
 @RestController
 @RequestMapping("/certificates")
 public class GiftCertificateController {
     private final GiftCertificateService giftCertificateService;
+    private final GiftCertificateAssembler giftCertificateAssembler;
+    private final TagAssembler tagAssembler;
+
 
     /**
-     * Injects an object of a class implementing {@link GiftCertificateService}.
+     * Injects an object of a class implementing {@link GiftCertificateService}, gift certificate assembler
+     * {@link GiftCertificateAssembler} and tag assembler {@link TagAssembler}.
      *
-     * @param giftCertificateService An object of a class implementing {@link GiftCertificateService}.
+     * @param giftCertificateService   An object of a class implementing {@link GiftCertificateService}.
+     * @param giftCertificateAssembler {@link GiftCertificateAssembler} using for create HATEOAS links.
+     * @param tagAssembler             {@link TagAssembler} using for create HATEOAS links.
      */
     @Autowired
-    public GiftCertificateController(GiftCertificateService giftCertificateService) {
+    public GiftCertificateController(GiftCertificateService giftCertificateService,
+                                     GiftCertificateAssembler giftCertificateAssembler, TagAssembler tagAssembler) {
         this.giftCertificateService = giftCertificateService;
+        this.giftCertificateAssembler = giftCertificateAssembler;
+        this.tagAssembler = tagAssembler;
     }
 
     /**
@@ -50,22 +71,22 @@ public class GiftCertificateController {
      * which implies that the method processes POST requests at /certificates and that the
      * information about the new gift certificate must be carried in request body in JSON format.
      * <p>
-     * The default response status is 200 - OK.
+     * The default response status is 201 - CREATED.
      *
      * @param giftCertificateDto Gift certificate to be inserted into storage. Inferred from the request body.
      * @return {@link ResponseEntity} with the inserted gift certificate and its location included.
      */
     @PostMapping
-    public ResponseEntity<GiftCertificateDto> addGiftCertificate(@RequestBody GiftCertificateDto giftCertificateDto) {
+    public ResponseEntity<EntityModel<GiftCertificateDto>> addGiftCertificate(@RequestBody GiftCertificateDto giftCertificateDto) {
         GiftCertificateDto addedGiftCertificateDto = giftCertificateService.addGiftCertificate(giftCertificateDto);
-        return new ResponseEntity<>(addedGiftCertificateDto, HttpStatus.OK);
+        return new ResponseEntity<>(giftCertificateAssembler.toModel(addedGiftCertificateDto), HttpStatus.CREATED);
     }
 
     /**
      * Inserts the tag passed in the request body into the storage.
      * <p>
      * Annotated with {@link PutMapping} with parameter consumes = "application/json",
-     * which implies that the method processes PUT requests at /certificates/id/tags where id is the identifier of the
+     * which implies that the method processes PUT requests at /certificates/{id}/tags where id is the identifier of the
      * gift certificate where tag to be inserted. Information about the new tag must be carried in request body
      * in JSON format.
      * <p>
@@ -76,17 +97,17 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the set of tags which belongs to the gift certificate.
      */
     @PutMapping("/{id}/tags")
-    public ResponseEntity<Set<TagDto>> addTagToGiftCertificate(@PathVariable("id") long giftCertificateId,
-                                                               @RequestBody TagDto tagDto) {
-        GiftCertificateDto giftCertificateDto = giftCertificateService.addTagToGiftCertificate(giftCertificateId, tagDto);
-        return new ResponseEntity<>(giftCertificateDto.getTags(), HttpStatus.OK);
+    public ResponseEntity<CollectionModel<EntityModel<TagDto>>> addTagToGiftCertificate(@PathVariable("id") long giftCertificateId,
+                                                                                        @RequestBody TagDto tagDto) {
+        Set<TagDto> tags = giftCertificateService.addTagToGiftCertificate(giftCertificateId, tagDto);
+        return new ResponseEntity<>(tagAssembler.toCollectionModel(tags), HttpStatus.OK);
     }
 
     /**
      * Returns the gift certificate with the specified identifier from the storage.
      * <p>
      * Annotated by {@link GetMapping} with parameter value = "/{id}". Therefore, processes GET requests at
-     * /certificates/id, where id is the identifier of the requested gift certificate
+     * /certificates/{id}, where id is the identifier of the requested gift certificate
      * represented by a natural number.
      * <p>
      * If there is no gift certificate with the specified id response gets status 404 - Not Found.
@@ -96,16 +117,16 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with found gift certificate.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<GiftCertificateDto> findGiftCertificateById(@PathVariable("id") long id) {
+    public ResponseEntity<EntityModel<GiftCertificateDto>> findGiftCertificateById(@PathVariable("id") long id) {
         GiftCertificateDto giftCertificate = giftCertificateService.findGiftCertificateById(id);
-        return new ResponseEntity<>(giftCertificate, HttpStatus.OK);
+        return new ResponseEntity<>(giftCertificateAssembler.toModel(giftCertificate), HttpStatus.OK);
     }
 
     /**
      * Returns the set of tags which belongs to gift certificate with the specified identifier from the storage.
      * <p>
      * Annotated by {@link GetMapping} with parameter value = "/{id}/tags". Therefore, processes GET requests at
-     * /certificates/id/tags, where id is the identifier of the requested gift certificate
+     * /certificates/{id}/tags, where id is the identifier of the requested gift certificate
      * represented by a natural number.
      * <p>
      * The default response status is 200 - OK.
@@ -114,52 +135,50 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the set of tags which belongs to the gift certificate.
      */
     @GetMapping("/{id}/tags")
-    public ResponseEntity<Set<TagDto>> findGiftCertificateTags(@PathVariable("id") long certificateId) {
-        GiftCertificateDto giftCertificate = giftCertificateService.findGiftCertificateById(certificateId);
-        Set<TagDto> tags = giftCertificate.getTags();
-        return new ResponseEntity<>(tags, HttpStatus.OK);
+    public ResponseEntity<CollectionModel<EntityModel<TagDto>>> findGiftCertificateTags(@PathVariable("id") long certificateId) {
+        Set<TagDto> tags = giftCertificateService.findGiftCertificateTags(certificateId);
+        CollectionModel<EntityModel<TagDto>> collectionModel = tagAssembler.toCollectionModel(tags);
+        collectionModel.forEach(tagDtoEntityModel -> tagDtoEntityModel.add(linkTo(methodOn(GiftCertificateController.class)
+                .deleteTagFromGiftCertificate(certificateId, tagDtoEntityModel.getContent().getTagId()))
+                .withRel("delete_tag_from_gift_certificate")));
+        collectionModel.add(linkTo(methodOn(GiftCertificateController.class)
+                .addTagToGiftCertificate(certificateId, null)).withRel("add_tag_to_gift_certificate"));
+        return new ResponseEntity<>(collectionModel, HttpStatus.OK);
     }
 
     /**
-     * Find the gift certificate in the storage by various parameter passed as a parameter in the request URI.
-     * If there is no parameters method returns all the gift certificates in the storage.
+     * Find gift certificates in the storage by various parameter passed as a parameter in the request URI.
+     * If there is no parameters method returns all gift certificates in the storage.
      * <p>
      * Annotated by {@link GetMapping} with no parameters. Therefore, processes GET requests at /certificates.
      * <p>
-     * Accepts optional request parameters {@code tagName}, {@code certificateName}, {@code certificateDescription},
-     * {@code order}, {@code direction}. All parameters can be used in conjunction.
+     * Accepts optional request parameters {@code tagNames}, {@code name}, {@code description},
+     * {@code order}, {@code page}, {@code per_page}. All parameters can be used in conjunction.
      * <p>
      * The {@code order} might contain one the following values:
-     * {@code name} or {@code description}. If {@code direction} not defined will be selected {@code direction} by {@code asc}.
+     * {@code name} or {@code -name} and {@code description} or {@code -description}.
+     * Minus sign indicates descending order. Default order is ascending without any signs.
      * <p>
-     * The {@code direction} might contain one the following values: {@code desc} or {@code asc}.
+     * The {@code page} contains number of the page. The {@code per_page} show how many elements will be displayed on the page.
      * <p>
      * The default response status is 200 - OK.
      *
-     * @param tagName                The parameter used to find gift certificates by tag name.
-     * @param certificateName        The parameter used to find gift certificates by certificate name.
-     * @param certificateDescription The parameter used to find gift certificates by certificate description.
-     * @param order                  The parameter used to choose order of sorting certificates.
-     * @param direction              The parameter used to choose direction of sorting certificates.
+     * @param queryParameters The parameters used to find gift certificates.
      * @return {@link ResponseEntity} with the list of the gift certificates.
      */
     @GetMapping
-    public ResponseEntity<List<GiftCertificateDto>> findGiftCertificatesByParameters
-    (@RequestParam(value = "tagName", required = false) String tagName,
-     @RequestParam(value = "certificateName", required = false) String certificateName,
-     @RequestParam(value = "certificateDescription", required = false) String certificateDescription,
-     @RequestParam(value = "order", required = false) String order,
-     @RequestParam(value = "direction", required = false) String direction) {
-        QueryParameter queryParameter = new QueryParameter(tagName, certificateName, certificateDescription, order, direction);
-        List<GiftCertificateDto> giftCertificates = giftCertificateService.findGiftCertificatesByParameters(queryParameter);
-        return new ResponseEntity<>(giftCertificates, HttpStatus.OK);
+    public ResponseEntity<CollectionModel<EntityModel<GiftCertificateDto>>> findGiftCertificatesByParameters
+    (@RequestParam(required = false) Map<String, String> queryParameters) {
+        List<GiftCertificateDto> giftCertificates = giftCertificateService
+                .findGiftCertificatesByParameters(queryParameters);
+        return new ResponseEntity<>(giftCertificateAssembler.toCollectionModel(giftCertificates), HttpStatus.OK);
     }
 
     /**
      * Updates the gift certificate in the storage using {@code giftCertificateDto} passed as a parameter.
      * <p>
-     * Annotated with{@link PutMapping} with parameter consumes = "application/json",
-     * which implies that the method processes PUT requests at /certificates/id, where id is the identifier of the
+     * Annotated with {@link PutMapping} with parameter consumes = "application/json",
+     * which implies that the method processes PUT requests at /certificates/{id}, where id is the identifier of the
      * certificate to be updated represented by a natural number and that the
      * information about the updated gift certificate must be carried in request body in JSON format.
      * <p>
@@ -170,28 +189,72 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the updated gift certificate.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<GiftCertificateDto> updateGiftCertificate(@PathVariable("id") long giftCertificateId,
-                                                                    @RequestBody GiftCertificateDto giftCertificateDto) {
+    public ResponseEntity<EntityModel<GiftCertificateDto>> updateGiftCertificate(@PathVariable("id") long giftCertificateId,
+                                                                                 @RequestBody GiftCertificateDto giftCertificateDto) {
         GiftCertificateDto updatedGiftCertificateDto = giftCertificateService
                 .updateGiftCertificate(giftCertificateId, giftCertificateDto);
-        return new ResponseEntity<>(updatedGiftCertificateDto, HttpStatus.OK);
+        return new ResponseEntity<>(giftCertificateAssembler.toModel(updatedGiftCertificateDto), HttpStatus.OK);
+    }
+
+    /**
+     * Updates the field of gift certificate in the storage using {@code giftCertificateField} passed as a parameter.
+     * <p>
+     * Annotated with {@link PatchMapping} with parameter consumes = "application/json",
+     * which implies that the method processes PATCH requests at /certificates/{id}, where id is the identifier of the
+     * certificate to be updated represented by a natural number and that the
+     * information about the updated gift certificate field must be carried in request body in JSON format.
+     * <p>
+     * The default response status is 200 - OK.
+     *
+     * @param giftCertificateId    The identifier of the gift certificate to be updated. Inferred from the request URI.
+     * @param giftCertificateField Updated field and value of the gift certificate.
+     * @return {@link ResponseEntity} with the updated gift certificate.
+     */
+    @PatchMapping("/{id}")
+    public ResponseEntity<EntityModel<GiftCertificateDto>> updateGiftCertificateField(@PathVariable("id") long giftCertificateId,
+                                                                                      @RequestBody GiftCertificateField giftCertificateField) {
+        GiftCertificateDto updatedGiftCertificateDto = giftCertificateService
+                .updateGiftCertificateField(giftCertificateId, giftCertificateField);
+        return new ResponseEntity<>(giftCertificateAssembler.toModel(updatedGiftCertificateDto), HttpStatus.OK);
     }
 
     /**
      * Deletes the gift certificate with the specified id from the storage.
      * <p>
-     * Annotated with{@link DeleteMapping} with parameter value = "/{id}",
+     * Annotated with {@link DeleteMapping} with parameter value = "/{id}",
      * which implies that the method processes DELETE requests at
-     * /certificates/id, where id is the identifier of the gift certificate to be deleted
+     * /certificates/{id}, where id is the identifier of the gift certificate to be deleted
      * represented by a natural number.
      * <p>
      * The default response status is 204 - No Content, as the response body is empty.
      *
      * @param id The identifier of the gift certificate to be deleted. Inferred from the request URI.
+     * @return {@link ResponseEntity} with http status - 204 (NO CONTENT).
      */
     @DeleteMapping("/{id}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteGiftCertificateById(@PathVariable("id") long id) {
+    public ResponseEntity<HttpStatus> deleteGiftCertificateById(@PathVariable("id") long id) {
         giftCertificateService.deleteGiftCertificateById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    /**
+     * Deletes tag from the gift certificate with the specified id from the storage.
+     * <p>
+     * Annotated with {@link DeleteMapping} with parameter value = "/{id}/tags/{tagId}",
+     * which implies that the method processes DELETE requests at
+     * /certificates/{id}/tags/{tagsId}, where id is the identifier of the gift
+     * certificate where tag with tagId will be deleted.
+     * <p>
+     * The default response status is 204 - No Content, as the response body is empty.
+     *
+     * @param certificateId The identifier of the gift certificate where need to delete tag. Inferred from the request URI.
+     * @param tagId         The identifier of the tag which need to delete from gift certificate. Inferred from the request URI.
+     * @return {@link ResponseEntity} with http status - 204 (NO CONTENT).
+     */
+    @DeleteMapping("/{id}/tags/{tagId}")
+    public ResponseEntity<HttpStatus> deleteTagFromGiftCertificate(@PathVariable("id") long certificateId,
+                                                                   @PathVariable("tagId") long tagId) {
+        giftCertificateService.deleteTagFromGiftCertificate(certificateId, tagId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

@@ -1,93 +1,58 @@
 package com.epam.esm.dao.impl;
 
 import com.epam.esm.dao.GiftCertificateDao;
-import com.epam.esm.dao.SqlQuery;
-import com.epam.esm.dao.mapper.GiftCertificateMapper;
-import com.epam.esm.dao.mapper.TagMapper;
 import com.epam.esm.entity.GiftCertificate;
-import com.epam.esm.entity.Tag;
-import com.epam.esm.exception.GeneratedKeysNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
+import com.epam.esm.util.QueryManager;
 import org.springframework.stereotype.Repository;
 
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.sql.Timestamp;
-import java.util.HashSet;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 @Repository
 public class GiftCertificateDaoImpl implements GiftCertificateDao {
-    private final JdbcTemplate jdbcTemplate;
-    private final GiftCertificateMapper giftCertificateMapper;
-    private final TagMapper tagMapper;
+    private static final String PAGE = "page";
+    private static final String PER_PAGE = "per_page";
+    private static final String SELECT_ALL_CERTIFICATES = "SELECT DISTINCT g FROM GiftCertificate g ";
+    private static final String DELETE_GIFT_CERTIFICATE_BY_ID = "DELETE FROM GiftCertificate WHERE id = ?1";
 
-    @Autowired
-    public GiftCertificateDaoImpl(JdbcTemplate jdbcTemplate, GiftCertificateMapper giftCertificateMapper, TagMapper tagMapper) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.giftCertificateMapper = giftCertificateMapper;
-        this.tagMapper = tagMapper;
-    }
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Override
     public long add(GiftCertificate entity) {
-        KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(con -> {
-            PreparedStatement preparedStatement = con.prepareStatement(SqlQuery.INSERT_CERTIFICATE, Statement.RETURN_GENERATED_KEYS);
-            preparedStatement.setString(1, entity.getName());
-            preparedStatement.setString(2, entity.getDescription());
-            preparedStatement.setBigDecimal(3, entity.getPrice());
-            preparedStatement.setInt(4, entity.getDuration());
-            preparedStatement.setTimestamp(5, Timestamp.valueOf(entity.getCreatedDate()));
-            preparedStatement.setTimestamp(6, Timestamp.valueOf(entity.getLastUpdateDate()));
-            return preparedStatement;
-        }, keyHolder);
-        if (keyHolder.getKey() != null) {
-            return keyHolder.getKey().longValue();
-        }
-        throw new GeneratedKeysNotFoundException("Generated id not found");
+        entityManager.persist(entity);
+        return entity.getId();
     }
 
     @Override
     public Optional<GiftCertificate> findById(long id) {
-        return jdbcTemplate.query(SqlQuery.SELECT_CERTIFICATE_BY_ID, giftCertificateMapper, id).stream().findFirst();
+        return Optional.ofNullable(entityManager.find(GiftCertificate.class, id));
     }
 
     @Override
     public void removeById(long id) {
-        jdbcTemplate.update(SqlQuery.DELETE_CERTIFICATE, id);
+        entityManager.createQuery(DELETE_GIFT_CERTIFICATE_BY_ID)
+                .setParameter(1, id).executeUpdate();
     }
 
     @Override
     public GiftCertificate update(GiftCertificate entity) {
-        jdbcTemplate.update(SqlQuery.UPDATE_CERTIFICATE, entity.getName(), entity.getDescription(), entity.getPrice(),
-                entity.getDuration(), Timestamp.valueOf(entity.getCreatedDate()), Timestamp.valueOf(entity.getLastUpdateDate()),
-                entity.getId());
-        return entity;
+        GiftCertificate updatedGiftCertificate = entityManager.merge(entity);
+        entityManager.flush();
+        entityManager.clear();
+        return updatedGiftCertificate;
     }
 
     @Override
-    public void addRelationBetweenTagAndGiftCertificate(long tagId, long giftCertificateId) {
-        jdbcTemplate.update(con -> {
-            PreparedStatement preparedStatement = con.prepareStatement(SqlQuery.INSERT_RELATION_BETWEEN_TAG_AND_GIFT_CERTIFICATE);
-            preparedStatement.setLong(1, giftCertificateId);
-            preparedStatement.setLong(2, tagId);
-            return preparedStatement;
-        });
-    }
-
-    @Override
-    public List<GiftCertificate> findCertificatesByQueryParameters(String query) {
-        return jdbcTemplate.query(SqlQuery.SELECT_CERTIFICATES_BY_PARAMETERS + query, giftCertificateMapper);
-    }
-
-    @Override
-    public Set<Tag> findGiftCertificateTags(long certificateId) {
-        return new HashSet<>(jdbcTemplate.query(SqlQuery.SELECT_CERTIFICATE_TAGS, tagMapper, certificateId));
+    public List<GiftCertificate> findAllByParameters(Map<String, String> queryParameters) {
+        int page = Integer.parseInt(queryParameters.get(PAGE));
+        int perPage = Integer.parseInt(queryParameters.get(PER_PAGE));
+        int firstResult = page == 1 ? 0 : page * perPage - perPage;
+        String query = QueryManager.createQueryForCertificates(queryParameters);
+        return entityManager.createQuery(SELECT_ALL_CERTIFICATES + query, GiftCertificate.class)
+                .setFirstResult(firstResult).setMaxResults(perPage).getResultList();
     }
 }

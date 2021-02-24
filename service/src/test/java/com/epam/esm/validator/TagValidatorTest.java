@@ -60,24 +60,4 @@ class TagValidatorTest {
     void whenIsNotValidTagThenShouldThrowException(TagDto tagDto) {
         assertThrows(ValidationException.class, () -> TagValidator.isValidTag(tagDto));
     }
-
-    public static Object[][] correctId() {
-        return new Object[][]{{1}, {23}, {32424}};
-    }
-
-    @ParameterizedTest
-    @MethodSource("correctId")
-    void whenIsValidIdThenShouldNotThrowException(long id) {
-        assertDoesNotThrow(() -> TagValidator.isValidId(id));
-    }
-
-    public static Object[][] incorrectId() {
-        return new Object[][]{{-1}, {0}, {-4567887}};
-    }
-
-    @ParameterizedTest
-    @MethodSource("incorrectId")
-    void whenIsNotValidIdThenShouldThrowException(long id) {
-        assertThrows(ValidationException.class, () -> TagValidator.isValidId(id));
-    }
 }

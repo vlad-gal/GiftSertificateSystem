@@ -1,1 +1,1 @@
-MJC-School Module #2. REST API Basics
+MJC-School Module #3. REST API Advanced
