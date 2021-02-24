@@ -8,6 +8,7 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -52,6 +53,7 @@ public class TagController {
      * @return {@link ResponseEntity} with the inserted tag and its location included.
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('tag:create')")
     public ResponseEntity<EntityModel<TagDto>> addTag(@Valid @RequestBody TagDto tagDto) {
         TagDto addedTagDto = tagService.addTag(tagDto);
         return new ResponseEntity<>(tagAssembler.toModel(addedTagDto), HttpStatus.CREATED);
@@ -70,6 +72,7 @@ public class TagController {
      * @return {@link ResponseEntity} with found tag.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('tag:read')")
     public ResponseEntity<EntityModel<TagDto>> findTagById(@PathVariable("id") @Positive long id) {
         TagDto tagDto = tagService.findTagById(id);
         return new ResponseEntity<>(tagAssembler.toModel(tagDto), HttpStatus.OK);
@@ -96,6 +99,7 @@ public class TagController {
      * @return {@link ResponseEntity} with the list of the tags.
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('tag:read')")
     public ResponseEntity<CollectionModel<EntityModel<TagDto>>> findAllTagsByParameters
     (@RequestParam(required = false) Map<String, String> queryParameters,
      @RequestParam(required = false, defaultValue = "0") @PositiveOrZero int page,
@@ -118,6 +122,7 @@ public class TagController {
      * @return {@link ResponseEntity} with http status - 204 (NO CONTENT).
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('tag:delete')")
     public ResponseEntity<HttpStatus> deleteTagById(@PathVariable("id") @Positive long id) {
         tagService.deleteTagById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

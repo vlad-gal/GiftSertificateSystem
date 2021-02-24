@@ -2,6 +2,7 @@ package com.epam.esm.dao.impl;
 
 import com.epam.esm.config.PersistenceConfig;
 import com.epam.esm.entity.User;
+import com.epam.esm.repository.UserRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 class UserDaoImplTest {
     @Autowired
-    private UserDao userDao;
+    private UserRepository userRepository;
     private HashMap<String, String> defaultQueryParameters;
 
     {
@@ -30,13 +31,13 @@ class UserDaoImplTest {
 
     @Test
     void whenFindAllByParametersThenShouldReturnListOfUsers() {
-        List<User> users = userDao.findAllByParameters(defaultQueryParameters);
+        List<User> users = userRepository.findAll(defaultQueryParameters);
         assertEquals(2, users.size());
     }
 
     @Test
     void whenFindAllByParametersThenShouldThrowException() {
-        assertThrows(NullPointerException.class, () -> userDao.findAllByParameters(null));
+        assertThrows(NullPointerException.class, () -> findAll.f(null));
     }
 
     @Test

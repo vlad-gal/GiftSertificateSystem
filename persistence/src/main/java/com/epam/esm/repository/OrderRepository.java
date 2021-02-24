@@ -25,4 +25,7 @@ public interface OrderRepository extends JpaRepository<Order, Long>, QuerydslPre
     @Query(value = "SELECT g FROM Order o JOIN o.giftCertificates g WHERE o.orderId=:orderId")
     List<GiftCertificate> findOrderGiftCertificates(@Param("orderId") long orderId);
 
+    @Query(value = "SELECT g FROM Order o JOIN o.giftCertificates g WHERE o.orderId=:orderId AND o.user.userId = :userId")
+    List<GiftCertificate> findUserOrderGiftCertificates(@Param("orderId") long orderId, @Param("userId") long userId);
+
 }

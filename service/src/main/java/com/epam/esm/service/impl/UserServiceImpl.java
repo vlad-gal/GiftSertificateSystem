@@ -1,11 +1,14 @@
 package com.epam.esm.service.impl;
 
 import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.RegistrationUserDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.ExceptionPropertyKey;
+import com.epam.esm.exception.InvalidCredentialsException;
 import com.epam.esm.exception.ResourceNotFoundException;
+import com.epam.esm.exception.UserAlreadyExistException;
 import com.epam.esm.repository.OrderRepository;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.UserService;
@@ -19,7 +22,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -33,6 +38,22 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final ModelMapper modelMapper;
+    private final PasswordEncoder passwordEncoder;
+
+    @Override
+    @Transactional
+    public UserDto add(RegistrationUserDto userDto) {
+        if (!userDto.getPassword().equals(userDto.getRepeatedPassword())) {
+            throw new InvalidCredentialsException(ExceptionPropertyKey.INCORRECT_CREDENTIALS);
+        }
+        if (userRepository.existsByLogin(userDto.getLogin())) {
+            throw new UserAlreadyExistException(ExceptionPropertyKey.USER_ALREADY_EXIST);
+        }
+        User user = modelMapper.map(userDto, User.class);
+        user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        User addedUser = userRepository.save(user);
+        return modelMapper.map(addedUser, UserDto.class);
+    }
 
     @Override
     public UserDto findUserById(long id) {
@@ -67,6 +88,12 @@ public class UserServiceImpl implements UserService {
         Order order = orderOptional
                 .orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.USER_ORDER_NOT_FOUND, userId, orderId));
         return modelMapper.map(order, OrderDto.class);
+    }
+
+    @Override
+    public UserDto findUserByLogin(String login) {
+        User user = userRepository.findByLogin(login).orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.USER_WITH_LOGIN_NOT_FOUND, login));
+        return modelMapper.map(user, UserDto.class);
     }
 
     private User checkAndGetUser(long id) {

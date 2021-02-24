@@ -10,6 +10,7 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -25,6 +26,7 @@ public class RestExceptionHandler {
     private static final String METHOD_NOT_SUPPORT = "method.not.support";
     private static final String BODY_MISSING = "body.missing";
     private static final String INTERNAL_ERROR = "internal.error";
+    private static final String ACCESS_DENIED = "access.denied";
     private final MessageSource messageSource;
 
     @Autowired
@@ -97,5 +99,13 @@ public class RestExceptionHandler {
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.INTERNAL_ERROR);
         log.error("Exception message: {}", exception);
         return new ResponseEntity<>(errorHandler, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(value = AccessDeniedException.class)
+    public ResponseEntity<ErrorHandler> handleAccessDeniedException(AccessDeniedException exception, Locale locale) {
+        String message = messageSource.getMessage(ACCESS_DENIED, null, locale);
+        ErrorHandler errorHandler = new ErrorHandler(message, HttpStatus.FORBIDDEN.value());
+        log.error("Access Denied Exception message: {}", exception);
+        return new ResponseEntity<>(errorHandler, HttpStatus.FORBIDDEN);
     }
 }

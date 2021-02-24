@@ -12,8 +12,10 @@ import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -66,6 +68,7 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the inserted gift certificate and its location included.
      */
     @PostMapping
+    @PreAuthorize("hasAuthority('gc:create')")
     public ResponseEntity<EntityModel<ResponseGiftCertificateDto>> addGiftCertificate
     (@RequestBody @Valid RequestGiftCertificateDto requestGiftCertificateDto) {
         ResponseGiftCertificateDto addedGiftCertificateDto = giftCertificateService.addGiftCertificate(requestGiftCertificateDto);
@@ -87,6 +90,7 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the set of tags which belongs to the gift certificate.
      */
     @PutMapping("/{id}/tags")
+    @PreAuthorize("hasAuthority('gc:update')")
     public ResponseEntity<CollectionModel<EntityModel<TagDto>>> addTagToGiftCertificate
     (@PathVariable("id") @Positive long giftCertificateId, @RequestBody @Valid TagDto tagDto) {
         Set<TagDto> tags = giftCertificateService.addTagToGiftCertificate(giftCertificateId, tagDto);
@@ -107,6 +111,7 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with found gift certificate.
      */
     @GetMapping("/{id}")
+    @PreAuthorize("permitAll()")
     public ResponseEntity<EntityModel<ResponseGiftCertificateDto>> findGiftCertificateById(@PathVariable("id")
                                                                                            @Positive long id) {
         ResponseGiftCertificateDto giftCertificate = giftCertificateService.findGiftCertificateById(id);
@@ -126,6 +131,7 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the set of tags which belongs to the gift certificate.
      */
     @GetMapping("/{id}/tags")
+    @PreAuthorize("hasAuthority('tag:read')")
     public ResponseEntity<CollectionModel<EntityModel<TagDto>>> findGiftCertificateTags(@PathVariable("id")
                                                                                         @Positive long certificateId) {
         Set<TagDto> tags = giftCertificateService.findGiftCertificateTags(certificateId);
@@ -159,6 +165,7 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the list of the gift certificates.
      */
     @GetMapping
+    @PreAuthorize("permitAll()")
     public ResponseEntity<CollectionModel<EntityModel<ResponseGiftCertificateDto>>> findGiftCertificatesByParameters
     (@RequestParam(required = false) Map<String, String> queryParameters,
      @RequestParam(required = false, defaultValue = "0") @PositiveOrZero int page,
@@ -183,6 +190,7 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the updated gift certificate.
      */
     @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('gc:update')")
     public ResponseEntity<EntityModel<ResponseGiftCertificateDto>> updateGiftCertificate
     (@PathVariable("id") @Positive long giftCertificateId, @RequestBody @Valid RequestGiftCertificateDto giftCertificateDto) {
         ResponseGiftCertificateDto updatedGiftCertificateDto = giftCertificateService
@@ -205,6 +213,7 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the updated gift certificate.
      */
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('gc:update')")
     public ResponseEntity<EntityModel<ResponseGiftCertificateDto>> updateGiftCertificateField
     (@PathVariable("id") @Positive long giftCertificateId, @RequestBody @Valid GiftCertificateField giftCertificateField) {
         ResponseGiftCertificateDto updatedGiftCertificateDto = giftCertificateService
@@ -226,6 +235,7 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with http status - 204 (NO CONTENT).
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('gc:delete')")
     public ResponseEntity<HttpStatus> deleteGiftCertificateById(@PathVariable("id") @Positive long id) {
         giftCertificateService.deleteGiftCertificateById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -246,6 +256,7 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with http status - 204 (NO CONTENT).
      */
     @DeleteMapping("/{id}/tags/{tagId}")
+    @PreAuthorize("hasAuthority('gc:delete')")
     public ResponseEntity<HttpStatus> deleteTagFromGiftCertificate(@PathVariable("id") @Positive long certificateId,
                                                                    @PathVariable("tagId") @Positive long tagId) {
         giftCertificateService.deleteTagFromGiftCertificate(certificateId, tagId);

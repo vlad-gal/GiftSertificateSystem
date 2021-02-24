@@ -29,4 +29,7 @@ public class ExceptionPropertyKey {
     public static final String MAX_PRICE = "";
     public static final String MIN_PRICE = "";
 
+    public static final String USER_WITH_LOGIN_NOT_FOUND = "";
+    public static final String INCORRECT_CREDENTIALS = "";
+    public static final String USER_ALREADY_EXIST = "";
 }

@@ -75,6 +75,14 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public List<ResponseGiftCertificateDto> findUserOrderGiftCertificates(long userId, long orderId) {
+        List<GiftCertificate> giftCertificates = orderRepository.findUserOrderGiftCertificates(userId,orderId);
+        return giftCertificates.stream()
+                .map(giftCertificate -> modelMapper.map(giftCertificate, ResponseGiftCertificateDto.class))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public TagDto mostWidelyUsedTagWithHighestCostOfAllOrders() {
         User user = userRepository.findUserWithHighestCostOfAllOrders().get(0);
         long userId = user.getUserId();

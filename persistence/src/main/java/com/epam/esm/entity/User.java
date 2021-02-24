@@ -16,8 +16,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userId;
     private String login;
+    private String password;
     private String firstName;
     private String lastName;
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "user")
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE,
+            CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinColumn(name = "roleId")
+    private Role role;
+
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            mappedBy = "user")
     private List<Order> orders;
 }
