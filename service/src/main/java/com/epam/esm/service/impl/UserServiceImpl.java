@@ -10,6 +10,7 @@ import com.epam.esm.exception.InvalidCredentialsException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.UserAlreadyExistException;
 import com.epam.esm.repository.OrderRepository;
+import com.epam.esm.repository.RoleRepository;
 import com.epam.esm.repository.UserRepository;
 import com.epam.esm.service.UserService;
 import com.epam.esm.util.ParameterManager;
@@ -37,6 +38,7 @@ import java.util.stream.Collectors;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
+    private final RoleRepository roleRepository;
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -51,6 +53,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = modelMapper.map(userDto, User.class);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
+        user.setRole(roleRepository.findDefaultRole());
         User addedUser = userRepository.save(user);
         return modelMapper.map(addedUser, UserDto.class);
     }
@@ -90,11 +93,11 @@ public class UserServiceImpl implements UserService {
         return modelMapper.map(order, OrderDto.class);
     }
 
-    @Override
-    public UserDto findUserByLogin(String login) {
-        User user = userRepository.findByLogin(login).orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.USER_WITH_LOGIN_NOT_FOUND, login));
-        return modelMapper.map(user, UserDto.class);
-    }
+//    @Override
+//    public UserDto findUserByLogin(String login) {
+//        User user = userRepository.findByLogin(login).orElseThrow(() -> new ResourceNotFoundException(ExceptionPropertyKey.USER_WITH_LOGIN_NOT_FOUND, login));
+//        return modelMapper.map(user, UserDto.class);
+//    }
 
     private User checkAndGetUser(long id) {
         Optional<User> userOptional = userRepository.findById(id);

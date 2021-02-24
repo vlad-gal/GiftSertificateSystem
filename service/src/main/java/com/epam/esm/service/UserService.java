@@ -17,7 +17,7 @@ public interface UserService {
 
     OrderDto findUserOrder(long orderId, long userId);
 
-    UserDto findUserByLogin(String login);
+//    UserDto findUserByLogin(String login);
 
     UserDto add(RegistrationUserDto userDto);
 }

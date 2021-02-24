@@ -1,10 +1,15 @@
 package com.epam.esm.filter;
 
+import com.epam.esm.dto.UserDto;
 import com.epam.esm.security.AuthenticationDetails;
 import com.epam.esm.security.JwtTokenProvider;
+import com.epam.esm.service.UserService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -15,6 +20,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Arrays;
 
 @Component
 @RequiredArgsConstructor
@@ -31,7 +37,7 @@ public class UserAccessFilter extends GenericFilterBean {
             AuthenticationDetails details = (AuthenticationDetails) authentication.getDetails();
             if (Long.parseLong(uri.split("/")[2]) != details.getId() && !details.isAdmin()) {
                 ((HttpServletResponse) response).sendError(HttpServletResponse.SC_FORBIDDEN);
-                throw new AccessDeniedException("Access denied");
+                return;
             }
         }
         chain.doFilter(request, response);

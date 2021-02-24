@@ -21,7 +21,7 @@ public class User {
     private String lastName;
     @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE,
             CascadeType.PERSIST, CascadeType.REFRESH})
-    @JoinColumn(name = "roleId")
+    @JoinColumn(name = ColumnName.ROLE_ID)
     private Role role;
 
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},

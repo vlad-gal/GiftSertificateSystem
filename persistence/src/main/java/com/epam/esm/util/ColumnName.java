@@ -37,8 +37,21 @@ public class ColumnName {
     public static final String PURCHASE_DATE = "purchase_date";
     public final String COST = "cost";
     /*
+    Permission table column name
+     */
+    public static final String PERMISSION_TABLE = "permissions";
+    public static final String PERMISSION_ID = "permissionId";
+    public static final String PERMISSION_NAME = "permissionName";
+    /*
+    Role table column name
+     */
+    public static final String ROLE_TABLE = "roles";
+    public static final String ROLE_ID = "roleId";
+    public static final String ROLE_NAME = "roleName";
+    /*
     Joined tables
      */
     public static final String CERTIFICATES_HAS_TAGS_TABLE = "certificates_has_tags";
     public static final String ORDERS_HAS_GIFT_CERTIFICATE_TABLE = "orders_has_gift_certificate";
+    public static final String PERMISSIONS_HAS_ROLES_TABLE = "permissions_has_roles";
 }

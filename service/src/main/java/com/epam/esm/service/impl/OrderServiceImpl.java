@@ -58,21 +58,21 @@ public class OrderServiceImpl implements OrderService {
         return modelMapper.map(order, OrderDto.class);
     }
 
-    @Override
-    public OrderDto findOrderById(long orderId) {
-        Optional<Order> optionalOrder = orderRepository.findById(orderId);
-        Order order = optionalOrder.orElseThrow(() ->
-                new ResourceNotFoundException(ExceptionPropertyKey.ORDER_WITH_ID_NOT_FOUND, orderId));
-        return modelMapper.map(order, OrderDto.class);
-    }
-
-    @Override
-    public List<ResponseGiftCertificateDto> findOrderGiftCertificates(long orderId) {
-        List<GiftCertificate> giftCertificates = orderRepository.findOrderGiftCertificates(orderId);
-        return giftCertificates.stream()
-                .map(giftCertificate -> modelMapper.map(giftCertificate, ResponseGiftCertificateDto.class))
-                .collect(Collectors.toList());
-    }
+//    @Override
+//    public OrderDto findOrderById(long orderId) {
+//        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+//        Order order = optionalOrder.orElseThrow(() ->
+//                new ResourceNotFoundException(ExceptionPropertyKey.ORDER_WITH_ID_NOT_FOUND, orderId));
+//        return modelMapper.map(order, OrderDto.class);
+//    }
+//
+//    @Override
+//    public List<ResponseGiftCertificateDto> findOrderGiftCertificates(long orderId) {
+//        List<GiftCertificate> giftCertificates = orderRepository.findOrderGiftCertificates(orderId);
+//        return giftCertificates.stream()
+//                .map(giftCertificate -> modelMapper.map(giftCertificate, ResponseGiftCertificateDto.class))
+//                .collect(Collectors.toList());
+//    }
 
     @Override
     public List<ResponseGiftCertificateDto> findUserOrderGiftCertificates(long userId, long orderId) {

@@ -1,5 +1,6 @@
 package com.epam.esm.entity;
 
+import com.epam.esm.util.ColumnName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -8,7 +9,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity
-@Table(name = "roles")
+@Table(name = ColumnName.ROLE_TABLE)
 @Data
 @EqualsAndHashCode(exclude = "users")
 @NoArgsConstructor
@@ -19,9 +20,9 @@ public class Role {
     private String roleName;
     @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
             fetch = FetchType.EAGER)
-    @JoinTable(name = "permissions_has_roles",
-            joinColumns = @JoinColumn(name = "roleId"),
-            inverseJoinColumns = @JoinColumn(name = "permissionId"))
+    @JoinTable(name = ColumnName.PERMISSIONS_HAS_ROLES_TABLE,
+            joinColumns = @JoinColumn(name = ColumnName.ROLE_ID),
+            inverseJoinColumns = @JoinColumn(name = ColumnName.PERMISSION_ID))
     private List<Permission> permissions;
     @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
             mappedBy = "role")

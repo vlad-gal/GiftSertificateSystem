@@ -68,13 +68,13 @@ public class PersistenceConfig {
     @Profile(value = {"dev", "prod"})
     @Bean
     public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource,
-                                                                 EntityManagerFactoryBuilder entityManagerFactoryBuilder) {
+                                                                       EntityManagerFactoryBuilder entityManagerFactoryBuilder) {
         return entityManagerFactoryBuilder.dataSource(dataSource).packages(PACKAGE_TO_SCAN).build();
     }
 
     @Profile("test")
     @Bean
-    public LocalContainerEntityManagerFactoryBean testManagerFactory(DataSource dataSource) {
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
         entityManager.setDataSource(dataSource);
         entityManager.setPackagesToScan(PACKAGE_TO_SCAN);
