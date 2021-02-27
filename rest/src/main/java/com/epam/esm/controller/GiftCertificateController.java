@@ -15,7 +15,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.PositiveOrZero;
@@ -44,7 +43,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * and delete tag from the gift certificate ({@link #deleteTagFromGiftCertificate}).
  *
  * @author Uladzislau Halatsevich
- * @version 2.0
+ * @version 3.0
  */
 
 @RequiredArgsConstructor
@@ -64,7 +63,7 @@ public class GiftCertificateController {
      * <p>
      * The default response status is 201 - CREATED.
      *
-     * @param giftCertificateDto Gift certificate to be inserted into storage. Inferred from the request body.
+     * @param requestGiftCertificateDto the request gift certificate dto
      * @return {@link ResponseEntity} with the inserted gift certificate and its location included.
      */
     @PostMapping
@@ -151,17 +150,19 @@ public class GiftCertificateController {
      * Annotated by {@link GetMapping} with no parameters. Therefore, processes GET requests at /certificates.
      * <p>
      * Accepts optional request parameters {@code tagNames}, {@code name}, {@code description},
-     * {@code order}, {@code page}, {@code per_page}. All parameters can be used in conjunction.
+     * {@code order}, {@code page}, {@code perPage}. All parameters can be used in conjunction.
      * <p>
      * The {@code order} might contain one the following values:
      * {@code name} or {@code -name} and {@code description} or {@code -description}.
      * Minus sign indicates descending order. Default order is ascending without any signs.
      * <p>
-     * The {@code page} contains number of the page. The {@code per_page} show how many elements will be displayed on the page.
+     * The {@code page} contains number of the page. The {@code perPage} show how many elements will be displayed on the page.
      * <p>
      * The default response status is 200 - OK.
      *
      * @param queryParameters The parameters used to find gift certificates.
+     * @param page            Contains number of the page.
+     * @param perPage         Show how many elements will be displayed on the page.
      * @return {@link ResponseEntity} with the list of the gift certificates.
      */
     @GetMapping
@@ -256,7 +257,7 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with http status - 204 (NO CONTENT).
      */
     @DeleteMapping("/{id}/tags/{tagId}")
-    @PreAuthorize("hasAuthority('gc:delete')")
+    @PreAuthorize("hasAnyAuthority('gc:delete','tag:delete')")
     public ResponseEntity<HttpStatus> deleteTagFromGiftCertificate(@PathVariable("id") @Positive long certificateId,
                                                                    @PathVariable("tagId") @Positive long tagId) {
         giftCertificateService.deleteTagFromGiftCertificate(certificateId, tagId);

@@ -6,7 +6,6 @@ import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.ExceptionPropertyKey;
-import com.epam.esm.exception.InvalidCredentialsException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.UserAlreadyExistException;
 import com.epam.esm.repository.OrderRepository;
@@ -23,6 +22,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -46,10 +46,10 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDto add(RegistrationUserDto userDto) {
         if (!userDto.getPassword().equals(userDto.getRepeatedPassword())) {
-            throw new InvalidCredentialsException(ExceptionPropertyKey.INCORRECT_CREDENTIALS);
+            throw new BadCredentialsException(ExceptionPropertyKey.INCORRECT_CREDENTIALS);
         }
         if (userRepository.existsByLogin(userDto.getLogin())) {
-            throw new UserAlreadyExistException(ExceptionPropertyKey.USER_WITH_LOGIN_ALREADY_EXIST,userDto.getLogin());
+            throw new UserAlreadyExistException(ExceptionPropertyKey.USER_WITH_LOGIN_ALREADY_EXIST, userDto.getLogin());
         }
         User user = modelMapper.map(userDto, User.class);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));

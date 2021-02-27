@@ -30,7 +30,7 @@ import java.util.Map;
  * and delete by id ({@link #deleteTagById}) tag from storage.
  *
  * @author Uladzislau Halatsevich
- * @version 2.0
+ * @version 3.0
  */
 
 @RequiredArgsConstructor
@@ -82,20 +82,22 @@ public class TagController {
      * Find tags in the storage by various parameter passed as a parameter in the request URI.
      * If there is no parameters method returns all tags in the storage.
      * <p>
-     * Annotated by {@link GetMapping} with no parameters. Therefore, processes GET requests at /certificates.
+     * Annotated by {@link GetMapping} with no parameters. Therefore, processes GET requests at /tags.
      * <p>
-     * Accepts optional request parameters {@code tagName}, {@code order}, {@code page}, {@code per_page}.
+     * Accepts optional request parameters {@code tagName}, {@code order}, {@code page}, {@code perPage}.
      * All parameters can be used in conjunction.
      * <p>
      * The {@code order} might contain one the following values:
      * {@code name} or {@code -name} and {@code id} or {@code -id}.
      * Minus sign indicates descending order. Default order is ascending without any signs.
      * <p>
-     * The {@code page} contains number of the page. The {@code per_page} show how many elements will be displayed on the page.
+     * The {@code page} contains number of the page. The {@code perPage} show how many elements will be displayed on the page.
      * <p>
      * The default response status is 200 - OK.
      *
      * @param queryParameters The parameters used to find tags.
+     * @param page            Contains number of the page.
+     * @param perPage         Show how many elements will be displayed on the page.
      * @return {@link ResponseEntity} with the list of the tags.
      */
     @GetMapping

@@ -32,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.GET,"/actuator/*").hasAuthority("actuator:action")
+                .antMatchers(HttpMethod.GET, "/actuator/*").hasAuthority("actuator:action")
 //                .authorizeRequests()
 //                .antMatchers(HttpMethod.POST, "/login").permitAll()
 //                .antMatchers(HttpMethod.GET, "/certificates").permitAll()
@@ -43,7 +43,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(userAccessFilter, JwtTokenFilter.class);
-//                .oauth2Client();
+//                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
     }
 
     @Bean
@@ -56,4 +56,5 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
+
 }

@@ -59,7 +59,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<ResponseGiftCertificateDto> findUserOrderGiftCertificates(long userId, long orderId) {
-        List<GiftCertificate> giftCertificates = orderRepository.findUserOrderGiftCertificates(userId, orderId);
+        List<GiftCertificate> giftCertificates = orderRepository.findUserOrderGiftCertificates(orderId, userId);
         return giftCertificates.stream()
                 .map(giftCertificate -> modelMapper.map(giftCertificate, ResponseGiftCertificateDto.class))
                 .collect(Collectors.toList());

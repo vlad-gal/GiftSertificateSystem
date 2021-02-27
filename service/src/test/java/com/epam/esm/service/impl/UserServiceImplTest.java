@@ -6,7 +6,6 @@ import com.epam.esm.dto.UserDto;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.Role;
 import com.epam.esm.entity.User;
-import com.epam.esm.exception.InvalidCredentialsException;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.exception.UserAlreadyExistException;
 import com.epam.esm.exception.ValidationException;
@@ -24,6 +23,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -93,7 +93,7 @@ class UserServiceImplTest {
         userDto.setLogin("pyatro");
         userDto.setPassword("123");
         userDto.setRepeatedPassword("pass");
-        assertThrows(InvalidCredentialsException.class, () -> userService.add(userDto));
+        assertThrows(BadCredentialsException.class, () -> userService.add(userDto));
     }
 
     @Test

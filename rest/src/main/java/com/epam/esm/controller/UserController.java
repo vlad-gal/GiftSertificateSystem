@@ -34,11 +34,12 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * <p>
  * {@code UserController} provides the user with methods to find user by id ({@link #findUserById}),
  * find all users by parameters ({@link #findAllUsersByParameters}), find user's orders ({@link #findUserOrders}),
- * find user's order ({@link #findUserOrder}), make order ({@link #makeOrder}) and find most widely used
- * tag ({@link #mostWidelyUsedTag}).
+ * find user's order ({@link #findUserOrder}), make order ({@link #makeOrder}), find most widely used
+ * tag ({@link #mostWidelyUsedTag}), and find user's order which contains gift certificates
+ * ({@link #findUserOrderGiftCertificates}).
  *
  * @author Uladzislau Halatsevich
- * @version 1.0
+ * @version 2.0
  */
 
 @RequiredArgsConstructor
@@ -49,9 +50,7 @@ public class UserController {
     private final OrderService orderService;
     private final UserAssembler userAssembler;
     private final TagAssembler tagAssembler;
-    //    private final OrderAssembler orderAssembler;
     private final GiftCertificateAssembler giftCertificateAssembler;
-
 
     /**
      * Returns the user with the specified identifier from the storage.
@@ -79,18 +78,20 @@ public class UserController {
      * Annotated by {@link GetMapping} with no parameters. Therefore, processes GET requests at /certificates.
      * <p>
      * Accepts optional request parameters {@code first_name}, {@code last_name}, {@code login},
-     * {@code order}, {@code page}, {@code per_page}. All parameters can be used in conjunction.
+     * {@code order}, {@code page}, {@code perPage}. All parameters can be used in conjunction.
      * <p>
      * The {@code order} might contain one the following values:
-     * {@code first_name} or {@code -first_name} and {@code last_name} or {@code -last_name} and {@code login}
+     * {@code firstName} or {@code -firstName} and {@code lastName} or {@code -lastName} and {@code login}
      * or {@code -login}.
      * Minus sign indicates descending order. Default order is ascending without any signs.
      * <p>
-     * The {@code page} contains number of the page. The {@code per_page} show how many elements will be displayed on the page.
+     * The {@code page} contains number of the page. The {@code perPage} show how many elements will be displayed on the page.
      * <p>
      * The default response status is 200 - OK.
      *
      * @param queryParameters The parameters used to find users.
+     * @param page            Contains number of the page.
+     * @param perPage         Show how many elements will be displayed on the page.
      * @return {@link ResponseEntity} with the list of the users.
      */
     @GetMapping
@@ -164,9 +165,8 @@ public class UserController {
      */
     @PostMapping("/{id}/orders")
     @PreAuthorize("hasAuthority('order:create')")
-
     public ResponseEntity<OrderDto> makeOrder(@PathVariable("id") @Positive long userId,
-                                                           @RequestBody List<@Positive Long> giftCertificateIds) {
+                                              @RequestBody List<@Positive Long> giftCertificateIds) {
         OrderDto order = orderService.makeOrder(userId, giftCertificateIds);
         order.add(linkTo(methodOn(UserController.class).findUserOrder(userId, order.getOrderId())).withSelfRel());
         order.add(linkTo(methodOn(UserController.class).findUserOrderGiftCertificates(userId, order.getOrderId())).withRel("gift_certificates"));
@@ -193,11 +193,13 @@ public class UserController {
     /**
      * Returns the list of gift certificates which belongs to order with the specified identifier from the storage.
      * <p>
-     * Annotated by {@link GetMapping} with parameter value = "/{id}/certificates". Therefore, processes GET requests at
-     * /orders/{id}/certificates, where id is the identifier of the requested order represented by a natural number.
+     * Annotated by {@link GetMapping} with parameter value = "/{id}/orders/{orderId}/certificates".
+     * Therefore, processes GET requests at /users/{id}/orders/{orderId}/certificates,
+     * where id is the identifier of the user which have order with orderId.
      * <p>
      * The default response status is 200 - OK.
      *
+     * @param userId  Identifier of the requested user. Inferred from the request URI.
      * @param orderId Identifier of the requested order. Inferred from the request URI.
      * @return {@link ResponseEntity} with the list of gift certificates which belongs to the order.
      */
