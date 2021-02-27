@@ -33,17 +33,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers(HttpMethod.GET, "/actuator/*").hasAuthority("actuator:action")
-//                .authorizeRequests()
-//                .antMatchers(HttpMethod.POST, "/login").permitAll()
-//                .antMatchers(HttpMethod.GET, "/certificates").permitAll()
-//                .anyRequest()
-//                .authenticated()
-//                .and()
-//                .oauth2Login().redirectionEndpoint().baseUri("/").and()
                 .and()
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(userAccessFilter, JwtTokenFilter.class);
-//                .oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
     }
 
     @Bean
@@ -56,5 +48,4 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(12);
     }
-
 }
