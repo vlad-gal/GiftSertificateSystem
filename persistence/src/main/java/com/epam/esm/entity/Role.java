@@ -18,8 +18,7 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long roleId;
     private String roleName;
-    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
-            fetch = FetchType.EAGER)
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JoinTable(name = ColumnName.PERMISSIONS_HAS_ROLES_TABLE,
             joinColumns = @JoinColumn(name = ColumnName.ROLE_ID),
             inverseJoinColumns = @JoinColumn(name = ColumnName.PERMISSION_ID))
