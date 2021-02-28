@@ -10,10 +10,10 @@ import javax.validation.constraints.Pattern;
 @Data
 @NoArgsConstructor
 public class AuthenticateRequestDto {
-    @NotBlank
+    @NotBlank(message = ExceptionPropertyKey.INCORRECT_LOGIN)
     @Pattern(regexp = "\\w{1,20}", message = ExceptionPropertyKey.INCORRECT_LOGIN)
     private String login;
-    @NotBlank
+    @NotBlank(message = ExceptionPropertyKey.INCORRECT_PASSWORD)
     @Pattern(regexp = "[\\S]{4,16}", message = ExceptionPropertyKey.INCORRECT_PASSWORD)
     private String password;
 }

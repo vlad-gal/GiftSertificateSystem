@@ -12,7 +12,7 @@ import javax.validation.constraints.Pattern;
 @NoArgsConstructor
 public class TagDto extends RepresentationModel<TagDto> {
     private long tagId;
-    @NotBlank
+    @NotBlank(message = ExceptionPropertyKey.INCORRECT_TAG_NAME)
     @Pattern(regexp = "[а-яА-Я\\w\\s\\d\\.?!]{1,45}", message = ExceptionPropertyKey.INCORRECT_TAG_NAME)
     private String name;
 }

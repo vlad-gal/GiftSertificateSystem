@@ -1,9 +1,6 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.dto.AuthenticateRequestDto;
-import com.epam.esm.dto.AuthenticateResponseDto;
-import com.epam.esm.dto.RegistrationUserDto;
-import com.epam.esm.dto.UserDto;
+import com.epam.esm.dto.*;
 import com.epam.esm.security.JwtTokenProvider;
 import com.epam.esm.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -57,9 +55,11 @@ public class AuthenticationController {
     @PostMapping("/login")
     @PreAuthorize("isAnonymous()")
     public ResponseEntity<AuthenticateResponseDto> authenticate(@RequestBody @Valid AuthenticateRequestDto request) {
-        authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.getLogin(), request.getPassword()));
+        Authentication authenticate = authenticationManager
+                .authenticate(new UsernamePasswordAuthenticationToken(request.getLogin(), request.getPassword()));
+        SecurityUser user = (SecurityUser) authenticate.getPrincipal();
         String token = jwtTokenProvider.createToken(request.getLogin());
-        return new ResponseEntity<>(new AuthenticateResponseDto(request.getLogin(), token), HttpStatus.OK);
+        return new ResponseEntity<>(new AuthenticateResponseDto(user.getUserId(), request.getLogin(), token), HttpStatus.OK);
     }
 
     /**
@@ -81,6 +81,6 @@ public class AuthenticationController {
         UserDto user = userService.add(userDto);
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(user.getLogin(), userDto.getPassword()));
         String token = jwtTokenProvider.createToken(user.getLogin());
-        return new ResponseEntity<>(new AuthenticateResponseDto(user.getLogin(), token), HttpStatus.OK);
+        return new ResponseEntity<>(new AuthenticateResponseDto(user.getUserId(), user.getLogin(), token), HttpStatus.OK);
     }
 }

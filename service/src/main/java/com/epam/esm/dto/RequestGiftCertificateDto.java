@@ -12,11 +12,11 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 public class RequestGiftCertificateDto {
-    @NotBlank
+    @NotBlank(message = ExceptionPropertyKey.INCORRECT_GIFT_CERTIFICATE_NAME)
     @Pattern(regexp = "[а-яА-Я\\w\\s\\d\\.,?!]{1,250}",
             message = ExceptionPropertyKey.INCORRECT_GIFT_CERTIFICATE_NAME)
     private String name;
-    @NotBlank
+    @NotBlank(message = ExceptionPropertyKey.INCORRECT_GIFT_CERTIFICATE_DESCRIPTION)
     @Pattern(regexp = "[а-яА-Я\\w\\s\\d\\.,?!]{1,250}",
             message = ExceptionPropertyKey.INCORRECT_GIFT_CERTIFICATE_DESCRIPTION)
     private String description;
