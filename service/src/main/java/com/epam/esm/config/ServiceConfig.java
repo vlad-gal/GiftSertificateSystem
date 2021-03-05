@@ -1,5 +1,6 @@
 package com.epam.esm.config;
 
+import com.epam.esm.util.converter.UserCredentialInformationConverter;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.config.Configuration;
 import org.modelmapper.convention.MatchingStrategies;
@@ -19,6 +20,7 @@ public class ServiceConfig {
                 .setFieldMatchingEnabled(true)
                 .setSkipNullEnabled(true)
                 .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
+        modelMapper.addConverter(new UserCredentialInformationConverter());
         return modelMapper;
     }
 }

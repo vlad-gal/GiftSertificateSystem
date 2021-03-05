@@ -11,7 +11,7 @@ import java.util.List;
 
 @Data
 @RequiredArgsConstructor
-public class SecurityUser implements UserDetails {
+public class UserCredentialInformation implements UserDetails {
     private final long userId;
     private final String login;
     private final String password;

@@ -1,6 +1,6 @@
 package com.epam.esm.security;
 
-import com.epam.esm.dto.SecurityUser;
+import com.epam.esm.dto.UserCredentialInformation;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
@@ -56,7 +56,7 @@ public class JwtTokenProvider {
     }
 
     public Authentication getAuthentication(String token) {
-        SecurityUser user = (SecurityUser) userDetailsService.loadUserByUsername(getLogin(token));
+        UserCredentialInformation user = (UserCredentialInformation) userDetailsService.loadUserByUsername(getLogin(token));
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken
                 = new UsernamePasswordAuthenticationToken(user.getLogin(), user.getPassword(), user.getAuthorities());
         usernamePasswordAuthenticationToken.setDetails(new AuthenticationDetails(user.getUserId(), user.isAdmin()));
