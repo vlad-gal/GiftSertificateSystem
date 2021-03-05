@@ -1,6 +1,6 @@
 package com.epam.esm.entity;
 
-import com.epam.esm.util.ColumnName;
+import com.epam.esm.constant.ColumnName;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 

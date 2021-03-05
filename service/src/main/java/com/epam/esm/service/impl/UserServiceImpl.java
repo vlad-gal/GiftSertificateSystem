@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Service
 public class UserServiceImpl implements UserService {
+    private static final long DEFAULT_USER_ROLE_ID = 2;
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final RoleRepository roleRepository;
@@ -53,7 +54,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = modelMapper.map(userDto, User.class);
         user.setPassword(passwordEncoder.encode(userDto.getPassword()));
-        user.setRole(roleRepository.findDefaultRole());
+        user.setRole(roleRepository.findRoleByRoleId(DEFAULT_USER_ROLE_ID));
         User addedUser = userRepository.save(user);
         return modelMapper.map(addedUser, UserDto.class);
     }

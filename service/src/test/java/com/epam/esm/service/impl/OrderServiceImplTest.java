@@ -85,24 +85,6 @@ class OrderServiceImplTest {
         assertThrows(ResourceNotFoundException.class, () -> orderService.makeOrder(1, Collections.singletonList(145L)));
     }
 
-    //
-//    @Test
-//    void whenFindOrderByExistIdThenShouldReturnOrder() {
-//        Order order = new Order();
-//        order.setOrderId(1);
-//        when(orderDao.findById(order.getOrderId())).thenReturn(Optional.of(order));
-//        OrderDto foundOrder = orderService.findOrderById(order.getOrderId());
-//        assertEquals(order, modelMapper.map(foundOrder, Order.class));
-//    }
-//
-//    @Test
-//    void whenFindOrderByNotExistIdThenShouldThrowException() {
-//        Order order = new Order();
-//        order.setOrderId(3312331);
-//        when(orderDao.findById(order.getOrderId())).thenThrow(ResourceNotFoundException.class);
-//        assertThrows(ResourceNotFoundException.class, () -> orderService.findOrderById(order.getOrderId()));
-//    }
-//
     @Test
     void whenFindUserOrderGiftCertificatesThenShouldReturnListOfGiftCertificates() {
         GiftCertificate giftCertificate = new GiftCertificate();

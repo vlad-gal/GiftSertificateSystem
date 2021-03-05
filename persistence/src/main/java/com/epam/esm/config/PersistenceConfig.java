@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -24,6 +25,7 @@ import java.beans.PropertyVetoException;
 
 @Configuration
 @ComponentScan("com.epam.esm")
+@EnableJpaRepositories("com.epam.esm")
 @ConfigurationProperties("spring.c3p0")
 public class PersistenceConfig {
     private static final String PACKAGE_TO_SCAN = "com.epam.esm.entity";

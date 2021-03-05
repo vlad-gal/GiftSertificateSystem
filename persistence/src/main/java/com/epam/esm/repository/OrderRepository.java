@@ -4,13 +4,12 @@ import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface OrderRepository extends JpaRepository<Order, Long>, QuerydslPredicateExecutor<Order> {
+public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query(value = "SELECT o FROM Order o JOIN o.giftCertificates g WHERE g.id=:id")
     List<Order> findOrdersWhereGiftCertificateUsed(@Param("id") long id);
 

@@ -5,8 +5,6 @@ import com.epam.esm.exception.ExceptionPropertyKey;
 import com.epam.esm.exception.ValidationException;
 import lombok.experimental.UtilityClass;
 
-import java.math.BigDecimal;
-
 @UtilityClass
 public class GiftCertificateValidator {
     private final String REGEX_NAME_AND_DESCRIPTION = "[а-яА-Я\\w\\s\\d\\.,?!]{1,250}";

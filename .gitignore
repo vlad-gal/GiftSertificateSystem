@@ -4,4 +4,4 @@ build
 *.class
 logs
 /database/generate.sql
-/persistence/src/main/java/com/epam/esm/util/GenerateQueries.java
+/persistence/src/main/java/com/epam/esm/GenerateQueries.java

@@ -1,4 +1,4 @@
-package com.epam.esm.util.audit;
+package com.epam.esm.audit;
 
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;

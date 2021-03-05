@@ -5,14 +5,12 @@ import com.epam.esm.entity.Role;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(classes = {PersistenceConfig.class})
-@EnableJpaRepositories("com.epam.esm")
 @ActiveProfiles("test")
 @Transactional
 class RoleRepositoryTest {
@@ -20,8 +18,8 @@ class RoleRepositoryTest {
     private RoleRepository roleRepository;
 
     @Test
-    void whenFindDefaultRoleThenShouldReturnRoleUser() {
-        Role defaultRole = roleRepository.findDefaultRole();
+    void whenFindRoleByRoleIdThenShouldReturnRoleUser() {
+        Role defaultRole = roleRepository.findRoleByRoleId(2);
         boolean conditional = defaultRole.getRoleName().equalsIgnoreCase("user");
         assertTrue(conditional);
     }

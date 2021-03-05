@@ -1,4 +1,4 @@
-package com.epam.esm.util;
+package com.epam.esm.constant;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;

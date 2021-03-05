@@ -71,7 +71,7 @@ class UserServiceImplTest {
         Role role = new Role();
         role.setRoleName("user");
         when(userRepository.existsByLogin(userDto.getLogin())).thenReturn(false);
-        when(roleRepository.findDefaultRole()).thenReturn(role);
+        when(roleRepository.findRoleByRoleId(2)).thenReturn(role);
         when(userRepository.save(any(User.class))).thenReturn(user);
         UserDto addedUser = userService.add(userDto);
         assertEquals(user.getLogin(), modelMapper.map(addedUser, User.class).getLogin());
