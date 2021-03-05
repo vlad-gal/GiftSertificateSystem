@@ -5,7 +5,11 @@ import com.epam.esm.entity.Role;
 import com.epam.esm.entity.User;
 import com.epam.esm.exception.ResourceNotFoundException;
 import com.epam.esm.repository.UserRepository;
+import com.epam.esm.util.converter.UserCredentialInformationConverter;
 import org.junit.jupiter.api.Test;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.config.Configuration;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collections;
@@ -18,7 +22,17 @@ import static org.mockito.Mockito.when;
 
 class UserDetailsServiceImplTest {
     private UserRepository userRepository = mock(UserRepository.class);
-    private UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl(userRepository);
+    private ModelMapper modelMapper = new ModelMapper();
+
+    {
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT)
+                .setFieldMatchingEnabled(true)
+                .setSkipNullEnabled(true)
+                .setFieldAccessLevel(Configuration.AccessLevel.PRIVATE);
+        modelMapper.addConverter(new UserCredentialInformationConverter());
+    }
+
+    private UserDetailsServiceImpl userDetailsService = new UserDetailsServiceImpl(userRepository, modelMapper);
 
     @Test
     void whenLoadUserByUsernameThenShouldReturnSecurityUser() {
