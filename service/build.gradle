@@ -1,5 +1,5 @@
 dependencies {
-    implementation project(":persistence");
+    implementation project(":persistence")
     compile('org.modelmapper:modelmapper:2.3.9')
     compile('com.fasterxml.jackson.core:jackson-annotations')
     compile('org.springframework:spring-jdbc')
@@ -18,5 +18,8 @@ jar{
     enabled = true
 }
 bootRun{
+    enabled = false
+}
+bootWar{
     enabled = false
 }

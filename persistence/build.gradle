@@ -22,6 +22,9 @@ querydsl {
     jpa = true
     querydslSourcesDir = "$buildDir/generated-source"
 }
+bootWar{
+    enabled = false
+}
 sourceSets {
     main {
         java {
