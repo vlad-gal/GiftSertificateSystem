@@ -10,3 +10,6 @@ dependencies {
 bootRun {
     mainClass = 'com.epam.esm.GiftCertificateSystem'
 }
+bootWar {
+    archiveFileName = 'api.war'
+}
