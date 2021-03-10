@@ -1,6 +1,6 @@
 package com.epam.esm.repository;
 
-import com.epam.esm.config.PersistenceConfig;
+import com.epam.esm.config.TestConfig;
 import com.epam.esm.entity.GiftCertificate;
 import com.epam.esm.entity.Order;
 import com.epam.esm.entity.Role;
@@ -19,7 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ContextConfiguration(classes = {PersistenceConfig.class})
+@ContextConfiguration(classes = {TestConfig.class})
 @ActiveProfiles("test")
 @Transactional
 class OrderRepositoryTest {

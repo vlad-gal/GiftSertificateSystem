@@ -1,6 +1,6 @@
 package com.epam.esm.repository;
 
-import com.epam.esm.config.PersistenceConfig;
+import com.epam.esm.config.TestConfig;
 import com.epam.esm.entity.QTag;
 import com.epam.esm.entity.Tag;
 import com.querydsl.core.types.ExpressionUtils;
@@ -21,7 +21,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@ContextConfiguration(classes = {PersistenceConfig.class})
+@ContextConfiguration(classes = {TestConfig.class})
 @ActiveProfiles("test")
 @Transactional
 class TagRepositoryTest {

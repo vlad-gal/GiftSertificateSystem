@@ -1,6 +1,6 @@
 package com.epam.esm.repository;
 
-import com.epam.esm.config.PersistenceConfig;
+import com.epam.esm.config.TestConfig;
 import com.epam.esm.entity.Role;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-@ContextConfiguration(classes = {PersistenceConfig.class})
+@ContextConfiguration(classes = {TestConfig.class})
 @ActiveProfiles("test")
 @Transactional
 class RoleRepositoryTest {
