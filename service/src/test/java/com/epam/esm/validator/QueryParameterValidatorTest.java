@@ -14,18 +14,12 @@ class QueryParameterValidatorTest {
 
     public static Object[][] correctQueryParametersForGiftCertificate() {
         Map<String, String> queryParameters1 = new HashMap<>();
-        queryParameters1.put("tagName1", "поход");
-        queryParameters1.put("tagName2", "отдых");
+        queryParameters1.put("tagName", "поход,отдых");
         queryParameters1.put("name", "Cert Name");
         queryParameters1.put("description", "Cert Desc");
         queryParameters1.put("order", "-name");
-        queryParameters1.put("page", "1");
-        queryParameters1.put("per_page", "10");
         Map<String, String> queryParameters2 = new HashMap<>();
-        queryParameters2.put("tagName1", "поход");
-        queryParameters2.put("tagName2", "отдых");
-        queryParameters1.put("page", "1");
-        queryParameters1.put("per_page", "10");
+        queryParameters2.put("tagName", "поход,отдых");
         Map<String, String> queryParameters3 = new HashMap<>();
         queryParameters3.put("name", "Cert Name");
         queryParameters3.put("description", "Cert Desc");
@@ -50,24 +44,18 @@ class QueryParameterValidatorTest {
 
     public static Object[][] incorrectQueryParametersForGiftCertificate() {
         Map<String, String> queryParameters1 = new HashMap<>();
-        queryParameters1.put("tagName1", "пох@од");
+        queryParameters1.put("tagName", "пох@од");
         Map<String, String> queryParameters2 = new HashMap<>();
         queryParameters2.put("name", "Cert N#$$#ame");
         Map<String, String> queryParameters3 = new HashMap<>();
         queryParameters3.put("description", "Cer#$#$t Desc");
         Map<String, String> queryParameters4 = new HashMap<>();
         queryParameters4.put("order", "asddqe");
-        Map<String, String> queryParameters5 = new HashMap<>();
-        queryParameters5.put("page", "3312a");
-        Map<String, String> queryParameters6 = new HashMap<>();
-        queryParameters6.put("per_page", "w44");
         return new Object[][]{
                 {queryParameters1},
                 {queryParameters2},
                 {queryParameters3},
-                {queryParameters4},
-                {queryParameters5},
-                {queryParameters6}
+                {queryParameters4}
         };
     }
 
@@ -81,8 +69,6 @@ class QueryParameterValidatorTest {
         Map<String, String> queryParameters1 = new HashMap<>();
         queryParameters1.put("tagName", "поход");
         queryParameters1.put("order", "-name");
-        queryParameters1.put("page", "1");
-        queryParameters1.put("per_page", "10");
         Map<String, String> queryParameters2 = new HashMap<>();
         queryParameters2.put("tagName1", "поход");
         queryParameters2.put("order", "id");
@@ -117,15 +103,13 @@ class QueryParameterValidatorTest {
 
     public static Object[][] correctQueryParametersForUser() {
         Map<String, String> queryParameters1 = new HashMap<>();
-        queryParameters1.put("first_name", "John");
-        queryParameters1.put("last_name", "Lukas");
+        queryParameters1.put("firstName", "John");
+        queryParameters1.put("lastName", "Lukas");
         queryParameters1.put("login", "swQ");
-        queryParameters1.put("order", "-first_name");
-        queryParameters1.put("page", "1");
-        queryParameters1.put("per_page", "10");
+        queryParameters1.put("order", "-firstName");
         Map<String, String> queryParameters2 = new HashMap<>();
         queryParameters2.put("login", "swQ");
-        queryParameters2.put("order", "last_name");
+        queryParameters2.put("order", "lastName");
         Map<String, String> queryParameters3 = new HashMap<>();
         queryParameters3.put("asdddqw", "swQ");
         queryParameters3.put("order", "login");
@@ -148,12 +132,10 @@ class QueryParameterValidatorTest {
 
     public static Object[][] incorrectQueryParametersForUser() {
         Map<String, String> queryParameters1 = new HashMap<>();
-        queryParameters1.put("first_name", "Joh@n");
+        queryParameters1.put("firstName", "Joh@n");
         queryParameters1.put("order", "-first_name");
-        queryParameters1.put("page", "1");
-        queryParameters1.put("per_page", "10");
         Map<String, String> queryParameters2 = new HashMap<>();
-        queryParameters2.put("last_name", "Lu@as");
+        queryParameters2.put("lastName", "Lu@as");
         Map<String, String> queryParameters3 = new HashMap<>();
         queryParameters3.put("login", "swQw233аываФQ");
         Map<String, String> queryParameters4 = new HashMap<>();

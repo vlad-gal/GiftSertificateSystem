@@ -1,23 +1,29 @@
 package com.epam.esm.controller;
 
-import com.epam.esm.controller.assembler.OrderAssembler;
+import com.epam.esm.controller.assembler.GiftCertificateAssembler;
 import com.epam.esm.controller.assembler.TagAssembler;
 import com.epam.esm.controller.assembler.UserAssembler;
 import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.ResponseGiftCertificateDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.dto.UserDto;
 import com.epam.esm.service.OrderService;
-import com.epam.esm.service.TagService;
 import com.epam.esm.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 import java.util.Map;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 /**
  * The {@code UserController} class is an endpoint of the API
@@ -28,12 +34,15 @@ import java.util.Map;
  * <p>
  * {@code UserController} provides the user with methods to find user by id ({@link #findUserById}),
  * find all users by parameters ({@link #findAllUsersByParameters}), find user's orders ({@link #findUserOrders}),
- * find user's order ({@link #findUserOrder}), make order ({@link #makeOrder}) and find most widely used
- * tag ({@link #mostWidelyUsedTag}).
+ * find user's order ({@link #findUserOrder}), make order ({@link #makeOrder}), find most widely used
+ * tag ({@link #mostWidelyUsedTag}), and find user's order which contains gift certificates
+ * ({@link #findUserOrderGiftCertificates}).
  *
  * @author Uladzislau Halatsevich
- * @version 1.0
+ * @version 2.0
  */
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -41,28 +50,7 @@ public class UserController {
     private final OrderService orderService;
     private final UserAssembler userAssembler;
     private final TagAssembler tagAssembler;
-    private final OrderAssembler orderAssembler;
-
-    /**
-     * Inject objects of classes implementing {@link UserService} and {@link OrderService}.
-     * User assembler {@link UserAssembler}, tag assembler {@link TagAssembler} and
-     * order assembler {@link OrderAssembler}.
-     *
-     * @param userService    An object of a class implementing {@link TagService}.
-     * @param orderService   An object of a class implementing {@link OrderService}.
-     * @param tagAssembler   {@link TagAssembler} using for create HATEOAS links.
-     * @param userAssembler  {@link UserAssembler} using for create HATEOAS links.
-     * @param orderAssembler {@link OrderAssembler} using for create HATEOAS links.
-     */
-    @Autowired
-    public UserController(UserService userService, OrderService orderService, TagAssembler tagAssembler,
-                          UserAssembler userAssembler, OrderAssembler orderAssembler) {
-        this.userService = userService;
-        this.orderService = orderService;
-        this.tagAssembler = tagAssembler;
-        this.userAssembler = userAssembler;
-        this.orderAssembler = orderAssembler;
-    }
+    private final GiftCertificateAssembler giftCertificateAssembler;
 
     /**
      * Returns the user with the specified identifier from the storage.
@@ -77,7 +65,8 @@ public class UserController {
      * @return {@link ResponseEntity} with found user.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<UserDto>> findUserById(@PathVariable("id") long id) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<EntityModel<UserDto>> findUserById(@PathVariable("id") @Positive long id) {
         UserDto userDto = userService.findUserById(id);
         return new ResponseEntity<>(userAssembler.toModel(userDto), HttpStatus.OK);
     }
@@ -89,24 +78,29 @@ public class UserController {
      * Annotated by {@link GetMapping} with no parameters. Therefore, processes GET requests at /certificates.
      * <p>
      * Accepts optional request parameters {@code first_name}, {@code last_name}, {@code login},
-     * {@code order}, {@code page}, {@code per_page}. All parameters can be used in conjunction.
+     * {@code order}, {@code page}, {@code perPage}. All parameters can be used in conjunction.
      * <p>
      * The {@code order} might contain one the following values:
-     * {@code first_name} or {@code -first_name} and {@code last_name} or {@code -last_name} and {@code login}
+     * {@code firstName} or {@code -firstName} and {@code lastName} or {@code -lastName} and {@code login}
      * or {@code -login}.
      * Minus sign indicates descending order. Default order is ascending without any signs.
      * <p>
-     * The {@code page} contains number of the page. The {@code per_page} show how many elements will be displayed on the page.
+     * The {@code page} contains number of the page. The {@code perPage} show how many elements will be displayed on the page.
      * <p>
      * The default response status is 200 - OK.
      *
      * @param queryParameters The parameters used to find users.
+     * @param page            Contains number of the page.
+     * @param perPage         Show how many elements will be displayed on the page.
      * @return {@link ResponseEntity} with the list of the users.
      */
     @GetMapping
+    @PreAuthorize("hasAuthority('user:read')")
     public ResponseEntity<CollectionModel<EntityModel<UserDto>>> findAllUsersByParameters
-    (@RequestParam(required = false) Map<String, String> queryParameters) {
-        List<UserDto> allUsers = userService.findAllUsersByParameters(queryParameters);
+    (@RequestParam(required = false) Map<String, String> queryParameters,
+     @RequestParam(required = false, defaultValue = "0") @PositiveOrZero int page,
+     @RequestParam(required = false, defaultValue = "10") @Positive int perPage) {
+        List<UserDto> allUsers = userService.findAllUsersByParameters(queryParameters, page, perPage);
         return new ResponseEntity<>(userAssembler.toCollectionModel(allUsers), HttpStatus.OK);
     }
 
@@ -122,9 +116,14 @@ public class UserController {
      * @return {@link ResponseEntity} with the list of orders which belongs to the user.
      */
     @GetMapping("/{id}/orders")
-    public ResponseEntity<CollectionModel<EntityModel<OrderDto>>> findUserOrders(@PathVariable("id") long userId) {
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<OrderDto>> findUserOrders(@PathVariable("id") @Positive long userId) {
         List<OrderDto> orders = userService.findUserOrders(userId);
-        return new ResponseEntity<>(orderAssembler.toCollectionModel(orders), HttpStatus.OK);
+        orders.forEach(orderDto -> {
+            orderDto.add(linkTo(methodOn(UserController.class).findUserOrder(userId, orderDto.getOrderId())).withSelfRel());
+            orderDto.add(linkTo(methodOn(UserController.class).findUserOrderGiftCertificates(userId, orderDto.getOrderId())).withRel("gift_certificates"));
+        });
+        return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
     /**
@@ -141,10 +140,13 @@ public class UserController {
      * @return {@link ResponseEntity} with found order.
      */
     @GetMapping("/{id}/orders/{orderId}")
-    public ResponseEntity<EntityModel<OrderDto>> findUserOrder(@PathVariable("id") long userId,
-                                                               @PathVariable("orderId") long orderId) {
-        OrderDto order = userService.findUserOrder(userId, orderId);
-        return new ResponseEntity<>(orderAssembler.toModel(order), HttpStatus.OK);
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<OrderDto> findUserOrder(@PathVariable("id") @Positive long userId,
+                                                  @PathVariable("orderId") @Positive long orderId) {
+        OrderDto order = userService.findUserOrder(orderId, userId);
+        order.add(linkTo(methodOn(UserController.class).findUserOrder(userId, orderId)).withSelfRel());
+        order.add(linkTo(methodOn(UserController.class).findUserOrderGiftCertificates(userId, orderId)).withRel("gift_certificates"));
+        return new ResponseEntity<>(order, HttpStatus.OK);
     }
 
     /**
@@ -162,10 +164,13 @@ public class UserController {
      * @return {@link ResponseEntity} with the made order and its location included.
      */
     @PostMapping("/{id}/orders")
-    public ResponseEntity<EntityModel<OrderDto>> makeOrder(@PathVariable("id") long userId,
-                                                           @RequestBody List<Long> giftCertificateIds) {
+    @PreAuthorize("hasAuthority('order:create')")
+    public ResponseEntity<OrderDto> makeOrder(@PathVariable("id") @Positive long userId,
+                                              @RequestBody List<@Positive Long> giftCertificateIds) {
         OrderDto order = orderService.makeOrder(userId, giftCertificateIds);
-        return new ResponseEntity<>(orderAssembler.toModel(order), HttpStatus.CREATED);
+        order.add(linkTo(methodOn(UserController.class).findUserOrder(userId, order.getOrderId())).withSelfRel());
+        order.add(linkTo(methodOn(UserController.class).findUserOrderGiftCertificates(userId, order.getOrderId())).withRel("gift_certificates"));
+        return new ResponseEntity<>(order, HttpStatus.CREATED);
     }
 
     /**
@@ -179,8 +184,30 @@ public class UserController {
      * @return {@link ResponseEntity} with the most widely used tag of a user with the highest cost of all orders.
      */
     @GetMapping("/top-tag")
+    @PreAuthorize("hasAuthority('tag:read-top')")
     public ResponseEntity<EntityModel<TagDto>> mostWidelyUsedTag() {
         TagDto mostWidelyUsedTag = orderService.mostWidelyUsedTagWithHighestCostOfAllOrders();
         return new ResponseEntity<>(tagAssembler.toModel(mostWidelyUsedTag), HttpStatus.OK);
+    }
+
+    /**
+     * Returns the list of gift certificates which belongs to order with the specified identifier from the storage.
+     * <p>
+     * Annotated by {@link GetMapping} with parameter value = "/{id}/orders/{orderId}/certificates".
+     * Therefore, processes GET requests at /users/{id}/orders/{orderId}/certificates,
+     * where id is the identifier of the user which have order with orderId.
+     * <p>
+     * The default response status is 200 - OK.
+     *
+     * @param userId  Identifier of the requested user. Inferred from the request URI.
+     * @param orderId Identifier of the requested order. Inferred from the request URI.
+     * @return {@link ResponseEntity} with the list of gift certificates which belongs to the order.
+     */
+    @GetMapping("/{id}/orders/{orderId}/certificates")
+    @PreAuthorize("hasAuthority('order:read')")
+    public ResponseEntity<CollectionModel<EntityModel<ResponseGiftCertificateDto>>> findUserOrderGiftCertificates
+    (@PathVariable("id") @Positive long userId, @PathVariable("orderId") @Positive long orderId) {
+        List<ResponseGiftCertificateDto> giftCertificates = orderService.findUserOrderGiftCertificates(userId, orderId);
+        return new ResponseEntity<>(giftCertificateAssembler.toCollectionModel(giftCertificates), HttpStatus.OK);
     }
 }

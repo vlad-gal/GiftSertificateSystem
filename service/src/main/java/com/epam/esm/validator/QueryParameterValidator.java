@@ -4,37 +4,34 @@ import com.epam.esm.exception.ExceptionPropertyKey;
 import com.epam.esm.exception.ValidationException;
 import lombok.experimental.UtilityClass;
 
+import java.util.Arrays;
 import java.util.Map;
 
 @UtilityClass
 public class QueryParameterValidator {
     private final String REGEX_TAG_NAME_VALUE = "[а-яА-Я\\w\\s\\d\\.?!]{1,45}";
-    private final String REGEX_TAG_NAME_KEY = "tagName([1-9]\\d*)?";
+    private final String REGEX_TAG_NAME_KEY = "tagName";
+    private final String COMMA = ",";
     private final String REGEX_GIFT_CERTIFICATE_NAME_AND_DESCRIPTION_VALUE = "[а-яА-Я\\w\\s\\d\\.,?!]{1,250}";
     private final String REGEX_GIFT_CERTIFICATE_NAME_KEY = "name";
     private final String REGEX_GIFT_CERTIFICATE_DESCRIPTION_KEY = "description";
-    private final String REGEX_ORDER_VALUE = "[-]?name|[-]?description|[-]?id|[-]?first_name|[-]?last_name|[-]?login";
+    private final String REGEX_ORDER_VALUE = "[-]?name|[-]?description|[-]?id|[-]?firstName|[-]?lastName|[-]?login";
     private final String REGEX_ORDER_KEY = "order";
-    private final String REGEX_PAGE_KEY = "page";
-    private final String REGEX_PER_PAGE_KEY = "per_page";
-    private final String REGEX_PAGE_VALUE = "[1-9]\\d*";
     private final String REGEX_LOGIN_KEY = "login";
     private final String REGEX_LOGIN_VALUE = "\\w{1,20}";
-    private final String REGEX_FIRST_NAME_KEY = "first_name";
-    private final String REGEX_LAST_NAME_KEY = "last_name";
+    private final String REGEX_FIRST_NAME_KEY = "firstName";
+    private final String REGEX_LAST_NAME_KEY = "lastName";
     private final String REGEX_USER_NAME_VALUE = "[A-ZА-Я][а-яa-z]{0,19}";
 
     public void isValidGiftCertificateQueryParameters(Map<String, String> queryParameters) {
         queryParameters.forEach((key, value) -> {
             if (key.matches(REGEX_TAG_NAME_KEY)) {
-                isValidTagName(value);
+                Arrays.stream(value.split(COMMA)).forEach(QueryParameterValidator::isValidTagName);
             }
         });
         isValidGiftCertificateName(queryParameters.get(REGEX_GIFT_CERTIFICATE_NAME_KEY));
         isValidGiftCertificateDescription(queryParameters.get(REGEX_GIFT_CERTIFICATE_DESCRIPTION_KEY));
         isValidOrderType(queryParameters.get(REGEX_ORDER_KEY));
-        isValidPage(queryParameters.get(REGEX_PAGE_KEY));
-        isValidPage(queryParameters.get(REGEX_PER_PAGE_KEY));
     }
 
     public void isValidTagQueryParameters(Map<String, String> queryParameters) {
@@ -44,8 +41,6 @@ public class QueryParameterValidator {
             }
         });
         isValidOrderType(queryParameters.get(REGEX_ORDER_KEY));
-        isValidPage(queryParameters.get(REGEX_PAGE_KEY));
-        isValidPage(queryParameters.get(REGEX_PER_PAGE_KEY));
     }
 
     public void isValidUserQueryParameters(Map<String, String> queryParameters) {
@@ -53,8 +48,6 @@ public class QueryParameterValidator {
         isValidName(queryParameters.get(REGEX_LAST_NAME_KEY));
         isValidLogin(queryParameters.get(REGEX_LOGIN_KEY));
         isValidOrderType(queryParameters.get(REGEX_ORDER_KEY));
-        isValidPage(queryParameters.get(REGEX_PAGE_KEY));
-        isValidPage(queryParameters.get(REGEX_PER_PAGE_KEY));
     }
 
     private void isValidLogin(String login) {
@@ -65,13 +58,7 @@ public class QueryParameterValidator {
 
     private void isValidName(String name) {
         if (name != null && !name.isEmpty() && !name.matches(REGEX_USER_NAME_VALUE)) {
-            throw new ValidationException(ExceptionPropertyKey.INCORRECT_USER_NAME, name);
-        }
-    }
-
-    private static void isValidPage(String page) {
-        if (page != null && !page.isEmpty() && !page.matches(REGEX_PAGE_VALUE)) {
-            throw new ValidationException(ExceptionPropertyKey.INCORRECT_PAGE, page);
+            throw new ValidationException(ExceptionPropertyKey.INCORRECT_LAST_NAME, name);
         }
     }
 

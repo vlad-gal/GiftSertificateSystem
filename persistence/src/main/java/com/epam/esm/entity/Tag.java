@@ -1,6 +1,6 @@
 package com.epam.esm.entity;
 
-import com.epam.esm.dao.ColumnName;
+import com.epam.esm.constant.ColumnName;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;

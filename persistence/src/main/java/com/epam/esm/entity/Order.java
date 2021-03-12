@@ -1,7 +1,7 @@
 package com.epam.esm.entity;
 
-import com.epam.esm.dao.ColumnName;
-import com.epam.esm.util.audit.AuditListener;
+import com.epam.esm.constant.ColumnName;
+import com.epam.esm.audit.AuditListener;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;

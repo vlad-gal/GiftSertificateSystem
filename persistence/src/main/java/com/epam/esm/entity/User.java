@@ -1,6 +1,6 @@
 package com.epam.esm.entity;
 
-import com.epam.esm.dao.ColumnName;
+import com.epam.esm.constant.ColumnName;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -16,8 +16,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userId;
     private String login;
+    private String password;
     private String firstName;
     private String lastName;
-    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH}, mappedBy = "user")
+    @ManyToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE,
+            CascadeType.PERSIST, CascadeType.REFRESH})
+    @JoinColumn(name = ColumnName.ROLE_ID)
+    private Role role;
+
+    @OneToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH},
+            mappedBy = "user")
     private List<Order> orders;
 }

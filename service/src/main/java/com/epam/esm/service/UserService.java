@@ -1,6 +1,7 @@
 package com.epam.esm.service;
 
 import com.epam.esm.dto.OrderDto;
+import com.epam.esm.dto.RegistrationUserDto;
 import com.epam.esm.dto.UserDto;
 
 import java.util.List;
@@ -10,9 +11,11 @@ public interface UserService {
 
     UserDto findUserById(long id);
 
-    List<UserDto> findAllUsersByParameters(Map<String, String> queryParameters);
+    List<UserDto> findAllUsersByParameters(Map<String, String> queryParameters, int page, int perPage);
 
     List<OrderDto> findUserOrders(long userId);
 
-    OrderDto findUserOrder(long userId, long orderId);
+    OrderDto findUserOrder(long orderId, long userId);
+
+    UserDto add(RegistrationUserDto userDto);
 }

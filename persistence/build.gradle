@@ -1,16 +1,34 @@
+plugins {
+    id "com.ewerk.gradle.plugins.querydsl"
+}
 dependencies {
-    implementation("mysql:mysql-connector-java")
-    implementation("com.mchange:c3p0:0.9.5.5")
-    implementation("org.hibernate:hibernate-core")
-    implementation("org.springframework:spring-orm")
+    compile("mysql:mysql-connector-java")
+    compile("com.mchange:c3p0:0.9.5.5")
+    compile('com.querydsl:querydsl-jpa')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    annotationProcessor('com.querydsl:querydsl-apt')
     testCompile("com.h2database:h2")
 }
 bootJar {
     enabled = false
 }
-jar{
+jar {
     enabled = true
 }
-bootRun{
+bootRun {
     enabled = false
+}
+querydsl {
+    jpa = true
+    querydslSourcesDir = "$buildDir/generated-source"
+}
+sourceSets {
+    main {
+        java {
+            srcDir "$buildDir/generated-source"
+        }
+    }
+}
+compileQuerydsl {
+    options.annotationProcessorPath = configurations.querydsl
 }

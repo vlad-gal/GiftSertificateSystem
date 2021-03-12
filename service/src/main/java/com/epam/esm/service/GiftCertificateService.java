@@ -1,7 +1,8 @@
 package com.epam.esm.service;
 
-import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.GiftCertificateField;
+import com.epam.esm.dto.RequestGiftCertificateDto;
+import com.epam.esm.dto.ResponseGiftCertificateDto;
 import com.epam.esm.dto.TagDto;
 
 import java.util.List;
@@ -10,21 +11,22 @@ import java.util.Set;
 
 public interface GiftCertificateService {
 
-    GiftCertificateDto addGiftCertificate(GiftCertificateDto giftCertificateDto);
+    ResponseGiftCertificateDto addGiftCertificate(RequestGiftCertificateDto giftCertificateDto);
 
     Set<TagDto> addTagToGiftCertificate(long giftCertificateId, TagDto tagDto);
 
-    GiftCertificateDto findGiftCertificateById(long id);
+    ResponseGiftCertificateDto findGiftCertificateById(long id);
 
-    List<GiftCertificateDto> findGiftCertificatesByParameters(Map<String, String> queryParameters);
+    List<ResponseGiftCertificateDto> findGiftCertificatesByParameters(Map<String, String> queryParameters,
+                                                                      int page, int perPage);
 
     void deleteGiftCertificateById(long id);
 
-    GiftCertificateDto updateGiftCertificate(long giftCertificateId, GiftCertificateDto giftCertificateDto);
+    ResponseGiftCertificateDto updateGiftCertificate(long giftCertificateId, RequestGiftCertificateDto giftCertificateDto);
 
     Set<TagDto> findGiftCertificateTags(long certificateId);
 
-    GiftCertificateDto updateGiftCertificateField(long giftCertificateId, GiftCertificateField giftCertificateField);
+    ResponseGiftCertificateDto updateGiftCertificateField(long giftCertificateId, GiftCertificateField giftCertificateField);
 
     void deleteTagFromGiftCertificate(long certificateId, long tagId);
 }

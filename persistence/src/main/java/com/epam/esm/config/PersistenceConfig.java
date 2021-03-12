@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.CannotGetJdbcConnectionException;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
@@ -24,6 +25,7 @@ import java.beans.PropertyVetoException;
 
 @Configuration
 @ComponentScan("com.epam.esm")
+@EnableJpaRepositories("com.epam.esm")
 @ConfigurationProperties("spring.c3p0")
 public class PersistenceConfig {
     private static final String PACKAGE_TO_SCAN = "com.epam.esm.entity";
@@ -67,14 +69,14 @@ public class PersistenceConfig {
 
     @Profile(value = {"dev", "prod"})
     @Bean
-    public LocalContainerEntityManagerFactoryBean managerFactory(DataSource dataSource,
-                                                                 EntityManagerFactoryBuilder entityManagerFactoryBuilder) {
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource,
+                                                                       EntityManagerFactoryBuilder entityManagerFactoryBuilder) {
         return entityManagerFactoryBuilder.dataSource(dataSource).packages(PACKAGE_TO_SCAN).build();
     }
 
     @Profile("test")
     @Bean
-    public LocalContainerEntityManagerFactoryBean testManagerFactory(DataSource dataSource) {
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
         LocalContainerEntityManagerFactoryBean entityManager = new LocalContainerEntityManagerFactoryBean();
         entityManager.setDataSource(dataSource);
         entityManager.setPackagesToScan(PACKAGE_TO_SCAN);

@@ -2,17 +2,22 @@ package com.epam.esm.controller;
 
 import com.epam.esm.controller.assembler.GiftCertificateAssembler;
 import com.epam.esm.controller.assembler.TagAssembler;
-import com.epam.esm.dto.GiftCertificateDto;
 import com.epam.esm.dto.GiftCertificateField;
+import com.epam.esm.dto.RequestGiftCertificateDto;
+import com.epam.esm.dto.ResponseGiftCertificateDto;
 import com.epam.esm.dto.TagDto;
 import com.epam.esm.service.GiftCertificateService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -38,31 +43,16 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
  * and delete tag from the gift certificate ({@link #deleteTagFromGiftCertificate}).
  *
  * @author Uladzislau Halatsevich
- * @version 2.0
+ * @version 3.0
  */
+
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/certificates")
 public class GiftCertificateController {
     private final GiftCertificateService giftCertificateService;
     private final GiftCertificateAssembler giftCertificateAssembler;
     private final TagAssembler tagAssembler;
-
-
-    /**
-     * Injects an object of a class implementing {@link GiftCertificateService}, gift certificate assembler
-     * {@link GiftCertificateAssembler} and tag assembler {@link TagAssembler}.
-     *
-     * @param giftCertificateService   An object of a class implementing {@link GiftCertificateService}.
-     * @param giftCertificateAssembler {@link GiftCertificateAssembler} using for create HATEOAS links.
-     * @param tagAssembler             {@link TagAssembler} using for create HATEOAS links.
-     */
-    @Autowired
-    public GiftCertificateController(GiftCertificateService giftCertificateService,
-                                     GiftCertificateAssembler giftCertificateAssembler, TagAssembler tagAssembler) {
-        this.giftCertificateService = giftCertificateService;
-        this.giftCertificateAssembler = giftCertificateAssembler;
-        this.tagAssembler = tagAssembler;
-    }
 
     /**
      * Inserts the gift certificate passed in the request body into the storage.
@@ -73,12 +63,14 @@ public class GiftCertificateController {
      * <p>
      * The default response status is 201 - CREATED.
      *
-     * @param giftCertificateDto Gift certificate to be inserted into storage. Inferred from the request body.
+     * @param requestGiftCertificateDto the request gift certificate dto
      * @return {@link ResponseEntity} with the inserted gift certificate and its location included.
      */
     @PostMapping
-    public ResponseEntity<EntityModel<GiftCertificateDto>> addGiftCertificate(@RequestBody GiftCertificateDto giftCertificateDto) {
-        GiftCertificateDto addedGiftCertificateDto = giftCertificateService.addGiftCertificate(giftCertificateDto);
+    @PreAuthorize("hasAuthority('gc:create')")
+    public ResponseEntity<EntityModel<ResponseGiftCertificateDto>> addGiftCertificate
+    (@RequestBody @Valid RequestGiftCertificateDto requestGiftCertificateDto) {
+        ResponseGiftCertificateDto addedGiftCertificateDto = giftCertificateService.addGiftCertificate(requestGiftCertificateDto);
         return new ResponseEntity<>(giftCertificateAssembler.toModel(addedGiftCertificateDto), HttpStatus.CREATED);
     }
 
@@ -97,8 +89,9 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the set of tags which belongs to the gift certificate.
      */
     @PutMapping("/{id}/tags")
-    public ResponseEntity<CollectionModel<EntityModel<TagDto>>> addTagToGiftCertificate(@PathVariable("id") long giftCertificateId,
-                                                                                        @RequestBody TagDto tagDto) {
+    @PreAuthorize("hasAuthority('gc:update')")
+    public ResponseEntity<CollectionModel<EntityModel<TagDto>>> addTagToGiftCertificate
+    (@PathVariable("id") @Positive long giftCertificateId, @RequestBody @Valid TagDto tagDto) {
         Set<TagDto> tags = giftCertificateService.addTagToGiftCertificate(giftCertificateId, tagDto);
         return new ResponseEntity<>(tagAssembler.toCollectionModel(tags), HttpStatus.OK);
     }
@@ -117,8 +110,10 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with found gift certificate.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<EntityModel<GiftCertificateDto>> findGiftCertificateById(@PathVariable("id") long id) {
-        GiftCertificateDto giftCertificate = giftCertificateService.findGiftCertificateById(id);
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<EntityModel<ResponseGiftCertificateDto>> findGiftCertificateById(@PathVariable("id")
+                                                                                           @Positive long id) {
+        ResponseGiftCertificateDto giftCertificate = giftCertificateService.findGiftCertificateById(id);
         return new ResponseEntity<>(giftCertificateAssembler.toModel(giftCertificate), HttpStatus.OK);
     }
 
@@ -135,7 +130,9 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the set of tags which belongs to the gift certificate.
      */
     @GetMapping("/{id}/tags")
-    public ResponseEntity<CollectionModel<EntityModel<TagDto>>> findGiftCertificateTags(@PathVariable("id") long certificateId) {
+    @PreAuthorize("hasAuthority('tag:read')")
+    public ResponseEntity<CollectionModel<EntityModel<TagDto>>> findGiftCertificateTags(@PathVariable("id")
+                                                                                        @Positive long certificateId) {
         Set<TagDto> tags = giftCertificateService.findGiftCertificateTags(certificateId);
         CollectionModel<EntityModel<TagDto>> collectionModel = tagAssembler.toCollectionModel(tags);
         collectionModel.forEach(tagDtoEntityModel -> tagDtoEntityModel.add(linkTo(methodOn(GiftCertificateController.class)
@@ -153,24 +150,29 @@ public class GiftCertificateController {
      * Annotated by {@link GetMapping} with no parameters. Therefore, processes GET requests at /certificates.
      * <p>
      * Accepts optional request parameters {@code tagNames}, {@code name}, {@code description},
-     * {@code order}, {@code page}, {@code per_page}. All parameters can be used in conjunction.
+     * {@code order}, {@code page}, {@code perPage}. All parameters can be used in conjunction.
      * <p>
      * The {@code order} might contain one the following values:
      * {@code name} or {@code -name} and {@code description} or {@code -description}.
      * Minus sign indicates descending order. Default order is ascending without any signs.
      * <p>
-     * The {@code page} contains number of the page. The {@code per_page} show how many elements will be displayed on the page.
+     * The {@code page} contains number of the page. The {@code perPage} show how many elements will be displayed on the page.
      * <p>
      * The default response status is 200 - OK.
      *
      * @param queryParameters The parameters used to find gift certificates.
+     * @param page            Contains number of the page.
+     * @param perPage         Show how many elements will be displayed on the page.
      * @return {@link ResponseEntity} with the list of the gift certificates.
      */
     @GetMapping
-    public ResponseEntity<CollectionModel<EntityModel<GiftCertificateDto>>> findGiftCertificatesByParameters
-    (@RequestParam(required = false) Map<String, String> queryParameters) {
-        List<GiftCertificateDto> giftCertificates = giftCertificateService
-                .findGiftCertificatesByParameters(queryParameters);
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<CollectionModel<EntityModel<ResponseGiftCertificateDto>>> findGiftCertificatesByParameters
+    (@RequestParam(required = false) Map<String, String> queryParameters,
+     @RequestParam(required = false, defaultValue = "0") @PositiveOrZero int page,
+     @RequestParam(required = false, defaultValue = "10") @Positive int perPage) {
+        List<ResponseGiftCertificateDto> giftCertificates = giftCertificateService
+                .findGiftCertificatesByParameters(queryParameters, page, perPage);
         return new ResponseEntity<>(giftCertificateAssembler.toCollectionModel(giftCertificates), HttpStatus.OK);
     }
 
@@ -189,9 +191,10 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the updated gift certificate.
      */
     @PutMapping("/{id}")
-    public ResponseEntity<EntityModel<GiftCertificateDto>> updateGiftCertificate(@PathVariable("id") long giftCertificateId,
-                                                                                 @RequestBody GiftCertificateDto giftCertificateDto) {
-        GiftCertificateDto updatedGiftCertificateDto = giftCertificateService
+    @PreAuthorize("hasAuthority('gc:update')")
+    public ResponseEntity<EntityModel<ResponseGiftCertificateDto>> updateGiftCertificate
+    (@PathVariable("id") @Positive long giftCertificateId, @RequestBody @Valid RequestGiftCertificateDto giftCertificateDto) {
+        ResponseGiftCertificateDto updatedGiftCertificateDto = giftCertificateService
                 .updateGiftCertificate(giftCertificateId, giftCertificateDto);
         return new ResponseEntity<>(giftCertificateAssembler.toModel(updatedGiftCertificateDto), HttpStatus.OK);
     }
@@ -211,9 +214,10 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with the updated gift certificate.
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<EntityModel<GiftCertificateDto>> updateGiftCertificateField(@PathVariable("id") long giftCertificateId,
-                                                                                      @RequestBody GiftCertificateField giftCertificateField) {
-        GiftCertificateDto updatedGiftCertificateDto = giftCertificateService
+    @PreAuthorize("hasAuthority('gc:update')")
+    public ResponseEntity<EntityModel<ResponseGiftCertificateDto>> updateGiftCertificateField
+    (@PathVariable("id") @Positive long giftCertificateId, @RequestBody @Valid GiftCertificateField giftCertificateField) {
+        ResponseGiftCertificateDto updatedGiftCertificateDto = giftCertificateService
                 .updateGiftCertificateField(giftCertificateId, giftCertificateField);
         return new ResponseEntity<>(giftCertificateAssembler.toModel(updatedGiftCertificateDto), HttpStatus.OK);
     }
@@ -232,7 +236,8 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with http status - 204 (NO CONTENT).
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteGiftCertificateById(@PathVariable("id") long id) {
+    @PreAuthorize("hasAuthority('gc:delete')")
+    public ResponseEntity<HttpStatus> deleteGiftCertificateById(@PathVariable("id") @Positive long id) {
         giftCertificateService.deleteGiftCertificateById(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -252,8 +257,9 @@ public class GiftCertificateController {
      * @return {@link ResponseEntity} with http status - 204 (NO CONTENT).
      */
     @DeleteMapping("/{id}/tags/{tagId}")
-    public ResponseEntity<HttpStatus> deleteTagFromGiftCertificate(@PathVariable("id") long certificateId,
-                                                                   @PathVariable("tagId") long tagId) {
+    @PreAuthorize("hasAnyAuthority('gc:delete','tag:delete')")
+    public ResponseEntity<HttpStatus> deleteTagFromGiftCertificate(@PathVariable("id") @Positive long certificateId,
+                                                                   @PathVariable("tagId") @Positive long tagId) {
         giftCertificateService.deleteTagFromGiftCertificate(certificateId, tagId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }

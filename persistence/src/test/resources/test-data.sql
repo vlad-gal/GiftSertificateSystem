@@ -65,16 +65,22 @@ VALUES (5, 5);
 INSERT INTO certificates_has_tags (certificateId, tagId)
 VALUES (5, 7);
 
-INSERT INTO users (userId, login, firstName, lastName)
-VALUES (1, 'genry', 'Гриша', 'Пупкин');
-INSERT INTO users (userId, login, firstName, lastName)
-VALUES (2, 'josh', 'Josh', 'Bin');
-INSERT INTO users (userId, login, firstName, lastName)
-VALUES (3, 'qwe', 'Vlad', 'Gal');
-INSERT INTO users (userId, login, firstName, lastName)
-VALUES (4, 'john', 'Витя', 'АК');
-INSERT INTO users (userId, login, firstName, lastName)
-VALUES (5, 'dou', 'Dick', 'Brant');
+INSERT INTO roles (roleId, roleName)
+VALUES (1, 'ADMIN');
+INSERT INTO roles (roleId, roleName)
+VALUES (2, 'USER');
+
+INSERT INTO users (userId, login, firstName, lastName, password, roleId)
+VALUES (1, 'genry', 'Гриша', 'Пупкин', '$2y$12$D5RYYL8r3v7.xoViUgALMetX9YWux53UrKjun0CjvicznCV81V69m', 1);
+INSERT INTO users (userId, login, firstName, lastName, password, roleId)
+VALUES (2, 'josh', 'Josh', 'Bin', '$2y$12$D5RYYL8r3v7.xoViUgALMetX9YWux53UrKjun0CjvicznCV81V69m', 2);
+INSERT INTO users (userId, login, firstName, lastName, password, roleId)
+VALUES (3, 'qwe', 'Vlad', 'Gal', '$2y$12$D5RYYL8r3v7.xoViUgALMetX9YWux53UrKjun0CjvicznCV81V69m', 2);
+INSERT INTO users (userId, login, firstName, lastName, password, roleId)
+VALUES (4, 'john', 'Витя', 'АК', '$2y$12$D5RYYL8r3v7.xoViUgALMetX9YWux53UrKjun0CjvicznCV81V69m', 2);
+INSERT INTO users (userId, login, firstName, lastName, password, roleId)
+VALUES (5, 'dou', 'Vasya', 'Brant', '$2y$12$D5RYYL8r3v7.xoViUgALMetX9YWux53UrKjun0CjvicznCV81V69m', 2);
+
 
 INSERT INTO orders (orderId, userId, purchase_date, cost)
 VALUES (1, 1, '2021-01-03 00:20:41', 123);
@@ -105,3 +111,61 @@ INSERT INTO orders_has_gift_certificate (orderId, certificateId)
 VALUES (1, 4);
 INSERT INTO orders_has_gift_certificate (orderId, certificateId)
 VALUES (1, 5);
+
+INSERT INTO permissions (permissionId, permissionName)
+VALUES (1, 'gc:read');
+INSERT INTO permissions (permissionId, permissionName)
+VALUES (2, 'gc:update');
+INSERT INTO permissions (permissionId, permissionName)
+VALUES (3, 'gc:delete');
+INSERT INTO permissions (permissionId, permissionName)
+VALUES (4, 'gc:create');
+INSERT INTO permissions (permissionId, permissionName)
+VALUES (5, 'order:read');
+INSERT INTO permissions (permissionId, permissionName)
+VALUES (6, 'order:create');
+INSERT INTO permissions (permissionId, permissionName)
+VALUES (7, 'tag:read');
+INSERT INTO permissions (permissionId, permissionName)
+VALUES (8, 'tag:create');
+INSERT INTO permissions (permissionId, permissionName)
+VALUES (9, 'tag:delete');
+INSERT INTO permissions (permissionId, permissionName)
+VALUES (10, 'actuator:action');
+INSERT INTO permissions (permissionId, permissionName)
+VALUES (11, 'tag:read-top');
+INSERT INTO permissions (permissionId, permissionName)
+VALUES (12, 'user:read');
+
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (1, 1);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (2, 1);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (3, 1);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (4, 1);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (5, 1);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (6, 1);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (7, 1);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (8, 1);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (9, 1);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (10, 1);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (11, 1);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (12, 1);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (1, 2);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (5, 2);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (6, 2);
+INSERT INTO permissions_has_roles (permissionId, roleId)
+VALUES (7, 2);

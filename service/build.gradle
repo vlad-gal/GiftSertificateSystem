@@ -1,11 +1,15 @@
 dependencies {
     implementation project(":persistence");
-    implementation('org.modelmapper:modelmapper:2.3.9')
-    implementation('com.fasterxml.jackson.core:jackson-annotations')
-    implementation('org.springframework:spring-jdbc')
-    implementation("org.springframework:spring-orm")
-    implementation("org.hibernate:hibernate-core")
-    implementation('org.springframework.boot:spring-boot-starter-hateoas')
+    compile('org.modelmapper:modelmapper:2.3.9')
+    compile('com.fasterxml.jackson.core:jackson-annotations')
+    compile('org.springframework:spring-jdbc')
+    compile("org.springframework:spring-orm")
+    compile("org.hibernate:hibernate-core")
+    compile('org.springframework.boot:spring-boot-starter-hateoas')
+    compile('org.springframework.boot:spring-boot-starter-data-jpa')
+    compile('org.springframework.boot:spring-boot-starter-validation')
+    compile('org.springframework.boot:spring-boot-starter-security')
+
 }
 bootJar {
     enabled = false
