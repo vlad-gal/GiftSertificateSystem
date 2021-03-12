@@ -108,7 +108,7 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorHandler, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-    @ExceptionHandler(value = AccessDeniedException.class)
+    @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorHandler> handleAccessDeniedException(AccessDeniedException exception, Locale locale) {
         String message = messageSource.getMessage(ACCESS_DENIED, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.ACCESS_DENIED);
@@ -116,7 +116,7 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorHandler, HttpStatus.FORBIDDEN);
     }
 
-    @ExceptionHandler(value = BadCredentialsException.class)
+    @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorHandler> handleBadCredentialsException(BadCredentialsException exception, Locale locale) {
         String message = messageSource.getMessage(INCORRECT_CREDENTIALS, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
@@ -124,7 +124,7 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorHandler, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = UserAlreadyExistException.class)
+    @ExceptionHandler(UserAlreadyExistException.class)
     public ResponseEntity<ErrorHandler> handleUserAlreadyExistException(UserAlreadyExistException exception, Locale locale) {
         String message = messageSource.getMessage(exception.getMessageKey(), exception.getMessageValues(), locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
@@ -132,12 +132,12 @@ public class RestExceptionHandler {
         return new ResponseEntity<>(errorHandler, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(value = MethodArgumentNotValidException.class)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorHandler> handleMethodArgumentNotValidException(MethodArgumentNotValidException exception, Locale locale) {
         String message = messageSource.getMessage(INCORRECT_VALUE, null, locale);
         ErrorHandler errorHandler = new ErrorHandler(message, ErrorCode.BAD_REQUEST);
         List<ErrorField> errorFields = new ArrayList<>();
-        exception.getBindingResult().getFieldErrors().stream().forEach(fieldError -> {
+        exception.getBindingResult().getFieldErrors().forEach(fieldError -> {
             ErrorField errorField = new ErrorField();
             errorField.setFieldName(fieldError.getField());
             errorField.setErrorCode(fieldError.getCode());
