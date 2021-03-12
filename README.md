@@ -1,1 +1,1 @@
-MJC-School Module #4. Authentication & Spring Security
+MJC-School Module #6. CI & CD
